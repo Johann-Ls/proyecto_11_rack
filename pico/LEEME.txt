@@ -1,0 +1,97 @@
+PROYECTO 11 - MONITOREO DE CUARTO DE COMUNICACIONES
+Carpeta "pico": codigo para la Raspberry Pi Pico 2 W
+====================================================
+
+QUE HAY EN ESTA CARPETA
+-----------------------
+main.py              Programa principal (sensores, ventiladores, alertas y nube).
+umqtt_simple.py      Libreria MQTT. NO la modifiques.
+secretos_ejemplo.py  Plantilla para tus claves. Se sube a GitHub VACIA.
+LEEME.txt            Este archivo.
+
+FALTA UN ARCHIVO A PROPOSITO: secretos.py
+Lo creas tu en la Pico (paso 2). Tiene tu clave del Wi-Fi y tu Key de
+Adafruit, por eso NUNCA va en esta carpeta ni en GitHub.
+
+
+A) CARGAR EL CODIGO EN LA PICO (con Thonny)
+-------------------------------------------
+1. Conecta la Pico por USB y abre Thonny.
+   Abajo a la derecha elige: MicroPython (Raspberry Pi Pico).
+
+2. Crear secretos.py:
+   - Abre secretos_ejemplo.py en Thonny.
+   - Completa los 4 datos entre comillas:
+       WIFI_SSID  = "nombre de tu hotspot"   (red de 2,4 GHz, no 5G)
+       WIFI_CLAVE = "clave de tu hotspot"
+       AIO_USER   = "JohannLs"               (con mayusculas tal cual)
+       AIO_KEY    = "tu Active Key de Adafruit"
+   - Archivo > Guardar como > Raspberry Pi Pico
+   - Nombre EXACTO: secretos.py
+   - OJO: NO guardes los cambios en secretos_ejemplo.py de tu computadora.
+     Si Thonny pregunta, guarda solo en la Pico.
+
+3. Abre umqtt_simple.py > Guardar como > Raspberry Pi Pico > umqtt_simple.py
+
+4. Abre main.py > Guardar como > Raspberry Pi Pico > main.py
+
+5. En la Pico deben quedar exactamente estos 3 archivos:
+       main.py
+       umqtt_simple.py
+       secretos.py
+
+6. Presiona Run (boton verde). En la consola deberias ver:
+       Conectando a Wi-Fi '...'
+       Wi-Fi conectado, IP: 192.168.x.x
+       Conectado a Adafruit IO
+       [5] 25.3 °C  48 % | agua:0 puerta:0 | vent:40% AUTO | nube:OK
+
+   Como se llama main.py, la Pico lo ejecuta sola al conectarla a la
+   corriente, aunque no este la computadora.
+
+
+B) AJUSTES QUE DEBES REVISAR (al inicio de main.py, seccion AJUSTES)
+-------------------------------------------------------------------
+- Pines: GP4/GP5 (SHT31), GP15 (agua), GP14 (puerta), GP16 (ventiladores),
+  GP17 (LED de alerta), GP18 (buzzer). Si conectaron distinto, cambia el numero.
+- AGUA_ACTIVO = 0  -> si al mojar el sensor no detecta nada, cambialo a 1.
+- PUERTA_ABIERTA = 1 -> si la puerta aparece al reves, cambialo a 0.
+- TEMP_MAX = 30.0  -> temperatura que dispara la alerta.
+- PROTECCION_TERMICA = True -> en modo OFF, si hace mucho calor, los
+  ventiladores se prenden igual. Pon False si quieren que OFF sea siempre 0 %.
+
+
+C) SUBIR ESTA CARPETA A GITHUB
+------------------------------
+1. ANTES de subir: el repositorio debe tener el archivo .gitignore con la
+   linea:  secretos.py
+2. Revisa que secretos_ejemplo.py tenga las comillas VACIAS ("").
+3. Revisa que en esta carpeta NO este secretos.py.
+4. En GitHub: Add file > Upload files > arrastra la carpeta "pico" completa
+   (en Chrome o Edge) > Commit changes.
+5. Busca "aio_" en tu repositorio: no debe aparecer nada.
+   Si aparece, en Adafruit ve a la llave y haz "Regenerate Key".
+
+
+D) ERRORES COMUNES
+------------------
+ImportError: no module named 'secretos'
+    -> No guardaste secretos.py en la Pico, o tiene otro nombre.
+
+ImportError: no module named 'umqtt_simple'
+    -> Falta umqtt_simple.py en la Pico.
+
+"Wi-Fi: no se pudo conectar" una y otra vez
+    -> Nombre o clave mal escritos, o el hotspot esta en 5 GHz.
+       En el celular activa "Maximizar compatibilidad" o banda 2,4 GHz.
+
+"Nube: error (4)" o "Nube: error (5)"
+    -> Usuario o Key de Adafruit incorrectos. Copialos otra vez desde la llave.
+
+Se conecta y se desconecta seguido
+    -> Puedes estar pasando el limite de Adafruit (30 datos por minuto).
+       No bajes INTERVALO_NUBE_MS de 15000 y no tengas muchas pestanas
+       del dashboard abiertas. Si Adafruit te bloqueo, espera unos minutos.
+
+"SHT31 sin respuesta"
+    -> Revisa SDA/SCL, la alimentacion a 3,3 V y GND del sensor.
