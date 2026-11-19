@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXUS Monitor · Cuarto de Comunicaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#040b1c;--cd:rgba(9,24,54,.78);--ln:rgba(70,130,255,.22);--bl:#2f9bff;--cy:#38c8ff;--gn:#22d38a;--or:#ff9f1c;--rd:#ff4d5e;--tx:#e8f0ff;--mu:#8aa0c4;--st:var(--gn);--led:#38c8ff;--f:'Plus Jakarta Sans',system-ui,sans-serif}
+body[data-s=warn]{--st:var(--or);--led:#ff9f1c}body[data-s=bad]{--st:var(--rd);--led:#ff4d5e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--tx);font:500 14px/1.45 var(--f);font-variant-numeric:tabular-nums;background:radial-gradient(900px 500px at 85% -10%,rgba(47,155,255,.22),transparent 70%),radial-gradient(700px 500px at 0 100%,rgba(20,70,170,.25),transparent 70%),var(--bg)}
+.side{position:fixed;inset:0 auto 0 0;width:208px;padding:26px 0;display:none;flex-direction:column;border-right:1px solid var(--ln);background:rgba(3,9,24,.7)}
+@media(min-width:1000px){.side{display:flex}.main{margin-left:208px}}
+.logo{padding:0 22px 26px;display:flex;flex-direction:column;gap:8px}
+.logo b{font:800 22px/1 var(--f);letter-spacing:.5px}.logo small{color:var(--mu);font-size:11px}
+.logo svg{width:46px;height:46px}
+.side a{display:flex;align-items:center;gap:12px;padding:13px 22px;color:var(--mu);text-decoration:none;font-weight:600;border-left:3px solid transparent}
+.side a.on,.side a:hover{color:var(--tx);background:linear-gradient(90deg,rgba(47,155,255,.28),transparent);border-left-color:var(--bl)}
+.side .pw{margin-top:auto;padding:0 22px;color:var(--mu);font-size:12px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.main{padding:20px 22px 48px;max-width:1380px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--ln)}
+.pill{display:inline-flex;align-items:center;gap:9px;padding:7px 15px;border-radius:999px;background:rgba(34,211,138,.1);font-weight:600}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--mu)}
+.dot.ok{background:var(--gn);box-shadow:0 0 10px var(--gn)}.dot.warn{background:var(--or);box-shadow:0 0 10px var(--or)}.dot.bad{background:var(--rd);box-shadow:0 0 10px var(--rd)}
+#age{color:var(--mu);font-size:13px}#age.stale{color:var(--or)}
+.sp{flex:1}
+button{font:600 13px var(--f);padding:9px 16px;border-radius:10px;border:1px solid var(--ln);background:rgba(15,40,90,.5);color:var(--tx);cursor:pointer;transition:.2s}
+button:hover{border-color:var(--cy)}button.pri,button.on{background:linear-gradient(180deg,#3aa4ff,#1d6fe0);border-color:#3aa4ff}
+button.act{background:rgba(255,159,28,.15);border-color:var(--or);color:var(--or)}
+button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.bell{position:relative;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--ln)}
+.bell i{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:var(--rd);font:700 11px/18px var(--f);text-align:center;font-style:normal}
+#tools{display:none;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;color:var(--mu);font-size:13px}#tools.show{display:flex}#tools button{padding:6px 12px;font-size:12px}
+#banner{display:none;margin-top:14px;padding:13px 18px;border-radius:12px;font-weight:700;color:#ffd5d9;background:rgba(255,77,94,.16);border:1px solid var(--rd)}#banner.show{display:block}
+.title{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin:20px 0 18px}
+h1{margin:0;font:800 clamp(26px,4vw,34px)/1.1 var(--f)}.title p{margin:6px 0 0;color:var(--mu);font-size:17px}
+.gen{display:flex;align-items:center;gap:14px;min-width:280px;padding:14px 20px;border-radius:18px;border:1px solid color-mix(in srgb,var(--st) 60%,transparent);background:linear-gradient(90deg,color-mix(in srgb,var(--st) 14%,transparent),transparent)}
+.gen svg.ic{width:34px;height:34px;color:var(--st)}.gen b{color:var(--st)}.gen svg.sp2{width:120px;height:36px;margin-left:auto}
+.card{position:relative;border:1px solid var(--ln);border-radius:18px;padding:18px;background:linear-gradient(160deg,rgba(25,60,130,.28),transparent 55%),var(--cd);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.g{display:grid;gap:16px;margin-bottom:16px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+@media(min-width:1100px){.g3{grid-template-columns:1.15fr 1fr 1fr}.gb{grid-template-columns:2fr 1.1fr 1fr}}
+@media(min-width:700px) and (max-width:1099px){.g3,.gb{grid-template-columns:1fr 1fr}}
+.kpi{--c:var(--gn);display:flex;align-items:center;gap:14px;overflow:hidden;padding:18px 18px 40px}
+.kpi.wr{--c:var(--or)}.kpi.bd{--c:var(--rd)}
+.kb{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;flex:none;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 35%,transparent)}
+.kb .ic{width:28px;height:28px}
+.kpi .l{color:var(--mu);font-size:13px}.kpi .v{font:700 28px/1.2 var(--f)}.kpi .v small{font-size:20px}
+.chip{display:inline-flex;align-items:center;gap:7px;color:var(--c);font-size:13px;font-weight:600}
+.chip::before{content:"✓";display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--c);color:#04111f;font-size:10px;font-weight:800}
+.kpi.wr .chip::before{content:"!"}.kpi.bd .chip::before{content:"✕"}
+.kpi svg.sk{position:absolute;left:0;right:0;bottom:0;width:100%;height:50px;opacity:.5;pointer-events:none}.kpi>div{position:relative;z-index:1}
+.rack{padding:0;overflow:hidden;min-height:260px}.rack svg{display:block;width:100%;height:100%}
+.led{fill:var(--led);animation:bk 2.4s ease-in-out infinite}
+@keyframes bk{0%,100%{opacity:.25}50%{opacity:1}}
+.vh{display:flex;align-items:center;gap:10px;margin-bottom:14px}.vh b{font-size:17px;flex:1}
+.vh svg{width:26px;height:26px}
+.tg{padding:5px 12px;border-radius:999px;font-size:13px;font-weight:600;color:var(--gn);background:rgba(34,211,138,.14)}
+.vb{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.donut{position:relative;width:168px;height:168px;flex:none}.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.dc{position:absolute;inset:0;display:grid;place-content:center;text-align:center}.dc b{font:800 34px/1 var(--f)}.dc span{font-size:12px;color:var(--mu);margin-top:4px}
+#arc{transition:stroke-dashoffset .6s}
+.vi{flex:1;min-width:130px;font-size:13px;color:var(--mu)}.vi strong{display:flex;align-items:center;gap:8px;color:var(--gn);font-size:15px;margin:4px 0 10px}.vi strong::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--gn)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px}
+input[type=range]{width:100%;margin:14px 0 0;accent-color:var(--bl)}
+.rotor{transform-origin:60px 60px;transform-box:view-box;animation:sp 2s linear infinite;animation-play-state:paused}@keyframes sp{to{transform:rotate(360deg)}}
+.al{border-color:rgba(255,77,94,.55);background:linear-gradient(160deg,rgba(255,77,94,.12),transparent 60%),var(--cd)}
+.al .vh svg{color:var(--rd)}.cnt{min-width:26px;height:26px;border-radius:13px;background:var(--rd);text-align:center;font:700 13px/26px var(--f)}.al.okk .cnt{background:var(--gn);color:#04111f}.al.okk{border-color:var(--ln);background:var(--cd)}
+.it{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--ln)}.it:first-of-type{border-top:0}
+.it .ic{width:26px;height:26px;margin-top:2px}.it.bd .ic{color:var(--rd)}.it.wr .ic{color:var(--or)}
+.it b{display:block;font-size:14px}.it span{color:var(--mu);font-size:13px}.it time{margin-left:auto;color:var(--mu);font-size:13px}
+.ch{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ch h3{margin:0 0 4px;font-size:14px;color:var(--or)}.ch .h2 h3{color:var(--cy)}
+.ch svg{width:100%;height:auto}.sec{margin:0 0 12px;font:700 17px var(--f);display:flex;gap:10px;align-items:center}.sec .ic{color:var(--bl)}
+@media(max-width:560px){.ch{grid-template-columns:1fr}}
+.fr{display:flex;align-items:center;gap:10px;margin:12px 0}.fr svg{width:22px;height:22px}.fr .bar2{flex:1;height:8px;border-radius:4px;background:rgba(120,160,255,.15);overflow:hidden}.fr .bar2 i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--bl),var(--cy));transition:width .5s}
+.sync{display:flex;align-items:center;gap:14px;margin-top:16px}.sync b{display:block;font-size:24px}.sync span{color:var(--mu);font-size:13px}
+ul#log{list-style:none;margin:0;padding:0 0 0 4px;max-height:210px;overflow:auto}
+#log li{position:relative;display:flex;gap:12px;padding:8px 0 8px 22px;border-left:2px solid var(--ln)}
+#log li::before{content:"";position:absolute;left:-6px;top:13px;width:10px;height:10px;border-radius:50%;background:var(--bl)}
+#log li.warn::before{background:var(--or)}#log li.bad::before{background:var(--rd)}
+#log time{color:var(--cy);flex:none}
+details{margin-top:16px}summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;font-weight:700;font-size:16px}summary::-webkit-details-marker{display:none}summary::after{content:"+"}details[open] summary::after{content:"−"}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:16px}
+label{display:grid;gap:6px;font-size:12px;color:var(--mu)}
+select,input[type=text],input[type=password],input[type=number]{padding:10px 12px;border-radius:10px;border:1px solid var(--ln);background:rgba(2,8,22,.8);color:var(--tx);font:500 14px var(--f)}
+.full{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap}.note{margin:12px 0 0;font-size:12px;color:var(--mu)}
+.eb{font:700 11px var(--f);letter-spacing:.24em;text-transform:uppercase;color:var(--cy);margin-bottom:8px}
+.clock{text-align:right;line-height:1.25}.clock b{display:block;font:700 19px var(--f);font-variant-numeric:tabular-nums}.clock span{font-size:12px;color:var(--mu);text-transform:capitalize}
+.mb{display:none;font:800 15px var(--f);letter-spacing:.14em}@media(max-width:999px){.mb{display:block}}
+.sh{display:flex;align-items:center;gap:14px;margin:26px 0 14px;font:700 12px var(--f);letter-spacing:.24em;text-transform:uppercase;color:var(--mu)}.sh::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--ln),transparent)}
+.exec{display:grid;gap:18px;grid-template-columns:1fr;border-left:4px solid var(--bl);margin-bottom:4px}@media(min-width:1000px){.exec{grid-template-columns:1.6fr 1fr;align-items:center}}
+.exec .tt{font:700 11px var(--f);letter-spacing:.2em;text-transform:uppercase;color:var(--cy);margin-bottom:8px}.exec p{margin:0;font-size:18px;line-height:1.55}
+.es{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}@media(max-width:560px){.es{grid-template-columns:repeat(2,1fr)}}
+.es div{padding:12px 6px;border-radius:12px;background:rgba(2,8,22,.55);border:1px solid var(--ln);text-align:center}.es b{display:block;font:800 21px/1.15 var(--f)}.es span{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.1em}
+footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--ln);display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;color:var(--mu);font-size:12px}footer b{color:var(--tx);letter-spacing:.16em}
+.pres .side,.pres #quickDemoBtn,.pres #cfgBtn,.pres #tools,.pres #cfgBox,.pres #pdfBtn{display:none!important}.pres .main{margin-left:0;zoom:1.08}.pres .mb{display:block}
+@media print{@page{size:A4 landscape;margin:8mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact;animation:none!important}.side,.bar button,#tools,#cfgBox,.bell{display:none!important}.main{margin-left:0!important}.mb{display:block}}
+@media(prefers-reduced-motion:reduce){.led,.rotor{animation:none!important}}
+#toasts{position:fixed;top:16px;right:16px;z-index:60;display:flex;flex-direction:column;gap:10px;width:min(360px,calc(100vw - 32px));pointer-events:none}
+.toast{pointer-events:auto;display:flex;gap:12px;align-items:flex-start;padding:14px 14px 14px 16px;border-radius:14px;background:rgba(6,16,38,.97);border:1px solid var(--ln);border-left:4px solid var(--cy);box-shadow:0 14px 34px rgba(0,0,0,.55);animation:tin .25s ease-out}
+.toast.bad{border-left-color:var(--rd)}.toast.warn{border-left-color:var(--or)}.toast.ok{border-left-color:var(--gn)}
+.toast div{flex:1}.toast b{display:block;margin-bottom:2px}.toast span{color:var(--mu);font-size:13px}.toast time{display:block;color:var(--mu);font-size:11px;margin-top:4px}
+.toast button{padding:0 6px;background:none;border:none;color:var(--mu);font-size:20px;line-height:1}
+@keyframes tin{from{opacity:0;transform:translateY(-8px)}}
+@media(prefers-reduced-motion:reduce){.toast{animation:none}}
+#notifBtn .ic{width:16px;height:16px;vertical-align:-3px;margin-right:4px}
+#notifBtn.blk{border-color:var(--or);color:var(--or)}
+.pres #notifBtn{display:none!important}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-t" viewBox="0 0 24 24"><path d="M14 14.8V5a2 2 0 00-4 0v9.8a4 4 0 104 0z"/></symbol>
+  <symbol id="i-h" viewBox="0 0 24 24"><path d="M12 3C8 8.5 5.5 11.5 5.5 15a6.5 6.5 0 0013 0c0-3.5-2.5-6.5-6.5-12z"/></symbol>
+  <symbol id="i-p" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 011-1h10a1 1 0 011 1v17M3 21h18M13 12h.01"/></symbol>
+  <symbol id="i-w" viewBox="0 0 24 24"><path d="M12 3.5c-3 4-5 6.5-5 9a5 5 0 0010 0c0-2.5-2-5-5-9z"/><path d="M3 20c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 6 0"/></symbol>
+  <symbol id="i-s" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5L16 9.5"/></symbol>
+  <symbol id="i-a" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></symbol>
+  <symbol id="i-b" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0112 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 004 0"/></symbol>
+  <symbol id="i-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-g" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></symbol>
+  <symbol id="i-d" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-e" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <path id="bl" d="M60 52C51 40 52 25 65 14C73 25 72 41 65 55Z" fill="#38c8ff"/>
+  <g id="blades"><use href="#bl"/><use href="#bl" transform="rotate(72 60 60)"/><use href="#bl" transform="rotate(144 60 60)"/><use href="#bl" transform="rotate(216 60 60)"/><use href="#bl" transform="rotate(288 60 60)"/><circle cx="60" cy="60" r="9" fill="#040b1c" stroke="#38c8ff" stroke-width="3"/></g>
+</defs></svg>
+
+<aside class="side">
+  <div class="logo"><svg viewBox="0 0 48 48" fill="none" stroke="#2f9bff" stroke-width="3" aria-hidden="true"><path d="M24 3l18 10.5v21L24 45 6 34.5v-21z"/><path d="M16 33V15l16 18V15"/></svg><b>NEXUS<br>MONITOR</b><small>Infraestructura y monitoreo</small></div>
+  <a href="#top" class="on"><svg class="ic"><use href="#i-d"/></svg>Dashboard</a>
+  <a href="#alertas"><svg class="ic"><use href="#i-a"/></svg>Alertas</a>
+  <a href="#eventos"><svg class="ic"><use href="#i-e"/></svg>Eventos</a>
+  <a href="#cfgBox" id="navCfg"><svg class="ic"><use href="#i-g"/></svg>Configuración</a>
+  <div class="pw">Powered by<br><b style="color:var(--tx)">Raspberry Pi Pico 2 W</b></div>
+</aside>
+
+<div class="main" id="top">
+  <div class="bar"><b class="mb">NEXUS MONITOR</b>
+    <div class="pill" role="status"><span class="dot" id="connDot"></span><span id="connTxt">Sin conexión</span></div>
+    <span id="age">Sin lecturas todavía</span>
+    <span class="sp"></span><div class="clock"><b id="clk">--:--:--</b><span id="clkD"></span></div>
+    <button type="button" id="notifBtn" title="Recibir avisos de alertas en este dispositivo"><svg class="ic"><use href="#i-b"/></svg><span>Activar notificaciones</span></button><button type="button" id="pdfBtn">Guardar PDF</button><button type="button" id="presBtn">Presentar</button><button type="button" id="quickDemoBtn">Demo</button>
+    <button type="button" class="pri" id="cfgBtn">Conectar</button>
+    <div class="bell" title="Alertas activas"><svg class="ic"><use href="#i-b"/></svg><i id="bellN">0</i></div>
+  </div>
+  <div id="tools"><span>Probar:</span><button type="button" id="injHot">Calor</button><button type="button" id="injDoor">Puerta</button><button type="button" id="injWater">Fuga</button><button type="button" id="injNorm">Normal</button></div>
+  <div id="banner" role="alert"></div>
+  <div id="toasts" aria-live="assertive"></div>
+
+  <div class="title">
+    <div><div class="eb">Reporte ejecutivo · Infraestructura crítica</div><h1>Cuarto de Comunicaciones</h1><p>Monitoreo en tiempo real de la infraestructura crítica</p></div>
+    <div class="gen"><svg class="ic"><use href="#i-s"/></svg><div>Estado General: <b id="gTxt">Sin datos</b></div><svg class="sp2" id="spG" viewBox="0 0 120 40" aria-hidden="true"></svg></div>
+  </div>
+
+  <section class="card exec" aria-label="Resumen ejecutivo"><div><div class="tt">Resumen ejecutivo</div><p id="execTxt">Esperando datos del rack para generar el resumen.</p></div><div class="es"><div><b id="esN">0</b><span>Lecturas</span></div><div><b id="esA">--</b><span>Promedio</span></div><div><b id="esM">--</b><span>Máxima</span></div><div><b id="esAl">0</b><span>Alertas</span></div></div></section>
+  <div class="sh">Indicadores clave</div>
+  <div class="g g4">
+    <section class="card kpi" id="cT"><div class="kb"><svg class="ic"><use href="#i-t"/></svg></div><div><div class="l">Temperatura actual</div><div class="v" id="temp">-- °C</div><span class="chip" id="chT">Esperando datos</span></div><svg class="sk" id="spT" viewBox="0 0 120 40" aria-hidden="true"></svg></section>
+    <section class="card kpi" id="cHum"><div class="kb"><svg class="ic"><use href="#i-h"/></svg></div><div><div class="l">Humedad actual</div><div class="v" id="hum">-- %</div><span class="chip" id="chH">Esperando datos</span></div><svg class="sk" id="spH" viewBox="0 0 120 40" aria-hidden="true"></svg></section>
+    <section class="card kpi" id="cPuerta"><div class="kb"><svg class="ic"><use href="#i-p"/></svg></div><div><div class="l">Estado de la puerta</div><div class="v" id="puerta">--</div><span class="chip" id="chP">Esperando datos</span></div><svg class="sk" id="spP" viewBox="0 0 120 40" aria-hidden="true"></svg></section>
+    <section class="card kpi" id="cAgua"><div class="kb"><svg class="ic"><use href="#i-w"/></svg></div><div><div class="l">Fuga de agua</div><div class="v" id="agua">--</div><span class="chip" id="chA">Esperando datos</span></div><svg class="sk" id="spA" viewBox="0 0 120 40" aria-hidden="true"></svg></section>
+  </div>
+
+  <div class="sh">Operación y seguridad</div>
+  <div class="g g3">
+    <section class="card rack" aria-label="Rack"><svg id="rackArt" viewBox="0 0 500 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustración del rack"></svg></section>
+
+    <section class="card" aria-label="Ventilación">
+      <div class="vh"><svg viewBox="0 0 120 120" aria-hidden="true"><g class="rotor"><use href="#blades"/></g></svg><b>Ventilación</b><span class="tg" id="fanMode">--</span></div>
+      <div class="vb">
+        <div class="donut"><svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38c8ff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs><circle cx="80" cy="80" r="64" fill="none" stroke="rgba(34,211,138,.18)" stroke-width="14"/><circle id="arc" cx="80" cy="80" r="64" pathLength="100" fill="none" stroke="url(#dg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100"/></svg><div class="dc"><b id="fan">-- %</b><span>PWM actual</span></div></div>
+        <div class="vi">Modo de control:<strong id="ctl">--</strong><span id="ctlD">Esperando datos del rack.</span></div>
+      </div>
+      <div class="seg" role="group" aria-label="Modo del ventilador"><button data-m="auto">Auto</button><button data-m="on">Encender</button><button data-m="off">Apagar</button></div>
+      <input type="range" id="fanRange" min="0" max="100" step="10" value="0" aria-label="Velocidad manual">
+    </section>
+
+    <section class="card al okk" id="alertas" aria-label="Centro de alertas">
+      <div class="vh"><svg class="ic" style="width:26px;height:26px"><use href="#i-a"/></svg><b>Centro de alertas</b><span class="cnt" id="alN">0</span></div>
+      <div id="alL"></div>
+    </section>
+  </div>
+
+  <div class="sh">Tendencias y registro</div>
+  <div class="g gb">
+    <section class="card">
+      <div class="sec"><svg class="ic"><use href="#i-d"/></svg>Historial de métricas <span style="margin-left:auto;color:var(--mu);font-size:12px;font-weight:500">Últimas 60 lecturas</span></div>
+      <div class="ch"><div><h3>Temperatura (°C)</h3><svg id="spark" viewBox="0 0 300 150" role="img" aria-label="Temperatura reciente"></svg></div><div class="h2"><h3>Humedad (%)</h3><svg id="sparkH" viewBox="0 0 300 150" role="img" aria-label="Humedad reciente"></svg></div></div>
+    </section>
+    <section class="card">
+      <div class="sec"><svg class="ic"><use href="#i-b"/></svg>Estado de ventiladores</div>
+      <div class="fr"><svg viewBox="0 0 120 120" aria-hidden="true"><g class="rotor"><use href="#blades"/></g></svg><span>Ventilador 1</span><div class="bar2"><i class="fb"></i></div><b class="fp">--%</b></div>
+      <div class="fr"><svg viewBox="0 0 120 120" aria-hidden="true"><g class="rotor"><use href="#blades"/></g></svg><span>Ventilador 2</span><div class="bar2"><i class="fb"></i></div><b class="fp">--%</b></div>
+      <div class="sync"><svg class="ic" style="width:34px;height:34px;color:var(--cy)"><use href="#i-c"/></svg><div><span>Última sincronización</span><b id="syncT">--:--:--</b><span id="syncD">--</span></div></div>
+    </section>
+    <section class="card" id="eventos">
+      <div class="sec"><svg class="ic"><use href="#i-e"/></svg>Historial de eventos</div>
+      <ul id="log"><li><time>--:--</time><span>Aquí aparecerán los eventos.</span></li></ul>
+    </section>
+  </div>
+
+  <details class="card" id="cfgBox">
+    <summary>Configuración · Enlace MQTT (HiveMQ Cloud)</summary>
+    <form id="cfg" autocomplete="off">
+      <label>Fuente de datos<select id="src"><option value="hivemq">HiveMQ Cloud (rack01/…)</option><option value="aio">Adafruit IO (feeds)</option></select></label>
+      <label>Servidor<input type="text" id="host" placeholder="xxxxxxxx.s1.eu.hivemq.cloud"></label>
+      <label>Puerto WSS<input type="number" id="port" value="8884"></label>
+      <label>Ruta WebSocket<input type="text" id="path" value="/mqtt"></label>
+      <label>Usuario (HiveMQ) o username (Adafruit)<input type="text" id="user"></label>
+      <label>Contraseña (HiveMQ) o Active Key (Adafruit)<input type="password" id="pass"></label>
+      <label>Prefijo de topics (solo HiveMQ)<input type="text" id="prefix" value="rack01"></label>
+      <div class="full"><button type="submit" class="on">Conectar</button><button type="button" id="demoBtn">Modo demo</button><button type="button" id="stopBtn">Desconectar</button></div>
+    </form>
+    <p class="note">La contraseña y la Active Key no se guardan en el navegador. HiveMQ: el usuario necesita suscripción a rack01/# y publicación en rack01/cmd/ventilador. Adafruit IO: escribe tu username y tu Active Key; el servidor se rellena solo (io.adafruit.com, puerto 443). No escribas la Key dentro del archivo ni la subas a GitHub.</p>
+  </details>
+  <footer><span><b>NEXUS MONITOR</b> · Centro de monitoreo de infraestructura crítica</span><span>Telemetría en tiempo real · Raspberry Pi Pico 2 W · MQTT · Adafruit IO / HiveMQ Cloud</span></footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script>if(typeof mqtt === "undefined"){ document.write('<script src="mqtt.min.js"><\/script>'); }</script>
+<script>
+const $ = id => document.getElementById(id);
+const TEMP_MAX = 30, TEMP_WARN = 28, MAX_HIST = 60, STALE_S = 30;
+const S = {temp:null, hum:null, puerta:null, agua:null, fan:null, mode:'--', last:0, hT:[], hH:[], hP:[], hA:[], hot:false, since:{}, nlv:{}, n:0, sum:0, mx:null, nAl:0};
+let client = null, demoTimer = null, mode = 'off', prefix = 'rack01', src = 'hivemq', aioUser = '';
+const AIO_FEEDS = ['temp', 'hum', 'ventiladores', 'agua', 'puerta', 'estado', 'alerta', 'cmd-ventiladores'];
+const hm = () => new Date().toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit'});
+
+(function rackArt(){
+  let s = '<defs><linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b2252"/><stop offset="1" stop-color="#030812"/></linearGradient><linearGradient id="cb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0b1730"/><stop offset=".5" stop-color="#18305c"/><stop offset="1" stop-color="#091227"/></linearGradient></defs><rect width="500" height="300" fill="url(#fl)"/><ellipse cx="250" cy="285" rx="230" ry="16" fill="rgba(56,200,255,.18)"/>';
+  for(let c = 0; c < 3; c++){
+    const x = 50 + c * 150;
+    s += '<rect x="' + x + '" y="26" width="130" height="256" rx="6" fill="url(#cb)" stroke="rgba(90,150,255,.5)"/>';
+    for(let r = 0; r < 12; r++){
+      const y = 36 + r * 20;
+      s += '<rect x="' + (x + 8) + '" y="' + y + '" width="114" height="15" rx="2" fill="#071026" stroke="rgba(90,150,255,.25)"/>';
+      for(let k = 0; k < 6; k++){
+        const d = ((c * 13 + r * 7 + k * 5) % 11) / 5;
+        s += '<circle class="led" cx="' + (x + 18 + k * 9) + '" cy="' + (y + 7.5) + '" r="2" style="animation-delay:-' + d.toFixed(1) + 's"/>';
+      }
+      s += '<rect x="' + (x + 78) + '" y="' + (y + 5) + '" width="36" height="5" rx="2" fill="rgba(120,160,255,.18)"/>';
+    }
+  }
+  $('rackArt').innerHTML = s;
+})();
+
+const pts = (a, lo, hi, x0, x1, y0, y1) => { const st = (x1 - x0) / (MAX_HIST - 1), off = (MAX_HIST - a.length) * st; return a.map((v, i) => [x0 + off + i * st, y1 - (Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo) * (y1 - y0)]); };
+const path = p => p.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' ');
+const grad = (id, c) => '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + c + '" stop-opacity=".32"/><stop offset="1" stop-color="' + c + '" stop-opacity="0"/></linearGradient></defs>';
+
+function spk(id, a, lo, hi, col){
+  const el = $(id); if(a.length < 2){ el.innerHTML = ''; return; } el.setAttribute('preserveAspectRatio', 'none');
+  const p = pts(a, lo, hi, 0, 120, 4, 36), l = p[p.length - 1];
+  el.innerHTML = grad('g' + id, col) + '<polygon points="0,40 ' + path(p) + ' ' + l[0] + ',40" fill="url(#g' + id + ')"/><polyline points="' + path(p) + '" fill="none" stroke="' + col + '" stroke-width="1.8" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+}
+
+function chart(id, a, lo, hi, col, unit, thr){
+  const L = 34, R = 292, T = 12, B = 124;
+  let s = grad('c' + id, col);
+  for(let i = 0; i <= 2; i++){
+    const y = T + (B - T) * i / 2;
+    s += '<line x1="' + L + '" x2="' + R + '" y1="' + y + '" y2="' + y + '" stroke="rgba(120,160,255,.15)"/><text x="' + (L - 6) + '" y="' + (y + 4) + '" text-anchor="end" font-size="10" fill="#8aa0c4">' + Math.round(hi - (hi - lo) * i / 2) + '</text>';
+  }
+  s += '<text x="' + L + '" y="144" font-size="10" fill="#8aa0c4">hace 60</text><text x="' + R + '" y="144" text-anchor="end" font-size="10" fill="#8aa0c4">ahora</text>';
+  if(thr !== undefined){ const y = B - (thr - lo) / (hi - lo) * (B - T); s += '<line x1="' + L + '" x2="' + R + '" y1="' + y + '" y2="' + y + '" stroke="#ff4d5e" stroke-opacity=".7" stroke-dasharray="5 4"/>'; }
+  if(a.length > 1){
+    const p = pts(a, lo, hi, L, R, T, B), l = p[p.length - 1], v = a[a.length - 1].toFixed(1) + unit;
+    const bx = Math.min(R - 46, l[0] - 23), by = Math.max(T, l[1] - 30);
+    s += '<polygon points="' + L + ',' + B + ' ' + path(p) + ' ' + l[0].toFixed(1) + ',' + B + '" fill="url(#c' + id + ')"/><polyline points="' + path(p) + '" fill="none" stroke="' + col + '" stroke-width="2.2" stroke-linejoin="round"/>';
+    s += '<circle cx="' + l[0].toFixed(1) + '" cy="' + l[1].toFixed(1) + '" r="4" fill="#fff" stroke="' + col + '" stroke-width="2"/><rect x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) + '" width="46" height="20" rx="6" fill="#071026" stroke="' + col + '"/><text x="' + (bx + 23).toFixed(1) + '" y="' + (by + 14).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">' + v + '</text>';
+  }
+  $(id).innerHTML = s;
+}
+
+function load(){ try{ const c = JSON.parse(localStorage.getItem('rackcfg') || '{}'); ['src','host','port','path','user','prefix'].forEach(k => { if(c[k]) $(k).value = c[k]; }); }catch(e){} }
+function save(){ try{ const c = {}; ['src','host','port','path','user','prefix'].forEach(k => c[k] = $(k).value); localStorage.setItem('rackcfg', JSON.stringify(c)); }catch(e){} }
+function setConn(kind, txt){ $('connDot').className = 'dot ' + kind; $('connTxt').textContent = txt; }
+
+function setFans(){
+  const p = S.fan || 0;
+  document.querySelectorAll('.rotor').forEach(r => {
+    if(p <= 0) r.style.animationPlayState = 'paused';
+    else { r.style.animationPlayState = 'running'; r.style.animationDuration = (2 - (p - 1) / 99 * 1.8).toFixed(2) + 's'; }
+  });
+}
+
+function narrative(lvl){
+  if(lvl === '') return 'Esperando datos del rack para generar el resumen.';
+  const head = lvl === 'ok' ? 'La infraestructura opera en condiciones óptimas.' : lvl === 'warn' ? 'La infraestructura requiere atención preventiva.' : 'Se requiere acción inmediata en la infraestructura.';
+  return head + ' Temperatura de ' + S.temp.toFixed(1) + ' °C frente a un límite de ' + TEMP_MAX + ' °C' + (S.hum !== null ? ', humedad de ' + S.hum.toFixed(0) + ' %' : '') + ', ' + (S.puerta ? 'puerta abierta' : 'acceso seguro') + ' y ' + (S.agua ? 'fuga de agua detectada' : 'sin fugas de agua') + '.' + (S.fan !== null ? ' Ventilación al ' + Math.round(S.fan) + ' %.' : '');
+}
+function normModo(m){
+  const t = m.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return (t === 'automatico' || t === 'automatica') ? 'auto' : (t === 'encendido' || t === 'encendida') ? 'on' : (t === 'apagado' || t === 'apagada') ? 'off' : t;
+}
+const MODOS = {auto:['Automática','Automático','Ventilación ajustada para mantener condiciones óptimas.'], on:['Encendida','Encendido','Ventilación al máximo.'], off:['Apagada','Apagado','Ventilación detenida.'], manual:['Manual','Manual','Velocidad fijada manualmente.']};
+const kpi = (card, chip, cls, txt) => { $(card).className = 'card kpi' + (cls ? ' ' + cls : ''); $(chip).textContent = txt; };
+
+function render(){
+  const T = S.temp;
+  const crit = (T !== null && T >= TEMP_MAX) || !!S.agua;
+  const warn = !crit && ((T !== null && T >= TEMP_WARN) || !!S.puerta || (S.hum !== null && (S.hum > 70 || S.hum < 25)));
+  const lvl = T === null ? '' : crit ? 'bad' : warn ? 'warn' : 'ok';
+  document.body.dataset.s = lvl;
+  $('gTxt').textContent = lvl === '' ? 'Sin datos' : crit ? 'Crítico' : warn ? 'Precaución' : 'Óptimo';
+  $('execTxt').textContent = narrative(lvl);
+  $('esN').textContent = S.n; $('esA').textContent = S.n ? (S.sum / S.n).toFixed(1) + ' °C' : '--'; $('esM').textContent = S.mx !== null ? S.mx.toFixed(1) + ' °C' : '--'; $('esAl').textContent = S.nAl;
+  if(T !== null){
+    $('temp').innerHTML = T.toFixed(1) + ' <small>°C</small>';
+    kpi('cT', 'chT', T >= TEMP_MAX ? 'bd' : T >= TEMP_WARN ? 'wr' : '', T >= TEMP_MAX ? 'Umbral crítico' : T >= TEMP_WARN ? 'Temperatura elevada' : 'En rango seguro');
+  }
+  if(S.hum !== null){ const hw = S.hum > 70 || S.hum < 25; $('hum').textContent = S.hum.toFixed(0) + ' %'; kpi('cHum', 'chH', hw ? 'wr' : '', hw ? 'Fuera de rango' : 'Nivel normal'); }
+  if(S.puerta !== null){ $('puerta').textContent = S.puerta ? 'Abierta' : 'Cerrada'; kpi('cPuerta', 'chP', S.puerta ? 'wr' : '', S.puerta ? 'Acceso físico detectado' : 'Acceso seguro'); }
+  if(S.agua !== null){ $('agua').textContent = S.agua ? 'Detectada' : 'No detectada'; kpi('cAgua', 'chA', S.agua ? 'bd' : '', S.agua ? 'Líquido en el piso' : 'Sin incidencias'); }
+  if(S.fan !== null){
+    const f = Math.min(100, Math.max(0, S.fan));
+    $('fan').textContent = f.toFixed(0) + '%'; $('arc').style.strokeDashoffset = (100 - f).toFixed(1);
+    document.querySelectorAll('.fb').forEach(b => b.style.width = f + '%'); document.querySelectorAll('.fp').forEach(b => b.textContent = f.toFixed(0) + '%');
+    if(document.activeElement !== $('fanRange')) $('fanRange').value = f;
+  }
+  const m = MODOS[S.mode];
+  $('fanMode').textContent = m ? m[0] : '--'; $('ctl').textContent = m ? m[1] : '--'; $('ctlD').textContent = m ? m[2] : 'Esperando datos del rack.';
+  document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === S.mode));
+  setFans();
+
+  const al = [];
+  if(T !== null && T >= TEMP_WARN) al.push({id:'t', k:T >= TEMP_MAX ? 'bd' : 'wr', i:'i-t', t:T >= TEMP_MAX ? 'Temperatura crítica' : 'Temperatura elevada', s:'Se recomienda revisar el sistema.'});
+  if(S.agua) al.push({id:'a', k:'bd', i:'i-w', t:'Fuga de agua detectada', s:'Verifique el sensor de agua.'});
+  if(S.puerta) al.push({id:'p', k:'wr', i:'i-p', t:'Puerta abierta', s:'Acceso físico detectado.'});
+  ['t','a','p'].forEach(k => { if(!al.some(x => x.id === k)){ delete S.since[k]; delete S.nlv[k]; } });
+  al.forEach(x => {
+    if(!S.since[x.id]){ S.since[x.id] = hm(); S.nAl++; }
+    if(S.nlv[x.id] !== x.k){
+      if(S.nlv[x.id] !== 'bd') notify(x.t, detalle(x.id), x.k === 'bd' ? 'bad' : 'warn', x.id);
+      S.nlv[x.id] = x.k;
+    }
+  });
+  $('esAl').textContent = S.nAl;
+  $('alL').innerHTML = al.length ? al.map(x => '<div class="it ' + x.k + '"><svg class="ic"><use href="#' + x.i + '"/></svg><div><b>' + x.t + '</b><span>' + x.s + '</span></div><time>' + S.since[x.id] + '</time></div>').join('') : '<div class="it"><svg class="ic" style="color:var(--gn)"><use href="#i-s"/></svg><div><b>Sin alertas activas</b><span>Todo funciona con normalidad.</span></div></div>';
+  $('alN').textContent = al.length; $('bellN').textContent = al.length; $('bellN').style.display = al.length ? '' : 'none';
+  $('alertas').className = 'card al' + (al.length ? '' : ' okk');
+
+  const msgs = [];
+  if(T !== null && T >= TEMP_MAX) msgs.push('Temperatura crítica: ' + T.toFixed(1) + ' °C');
+  if(S.agua) msgs.push('Fuga de agua detectada');
+  $('banner').textContent = msgs.join(' · '); $('banner').className = msgs.length ? 'show' : '';
+
+  const st = {bad:'#ff4d5e', warn:'#ff9f1c'}[lvl] || '#22d38a';
+  spk('spG', S.hT, 15, 40, st); spk('spT', S.hT, 15, 40, '#38c8ff'); spk('spH', S.hH, 20, 80, '#38c8ff'); spk('spP', S.hP, 0, 1.4, '#22d38a'); spk('spA', S.hA, 0, 1.4, '#38c8ff');
+  chart('spark', S.hT, 15, 40, '#ff9f1c', ' °C', TEMP_MAX); chart('sparkH', S.hH, 20, 80, '#2f9bff', ' %');
+}
+
+function addLog(text, kind){
+  const ul = $('log');
+  if(ul.children.length === 1 && ul.firstChild.textContent.includes('Aquí aparecerán')) ul.innerHTML = '';
+  const li = document.createElement('li'), tm = document.createElement('time'), sp = document.createElement('span');
+  if(kind) li.className = kind;
+  tm.textContent = hm(); sp.textContent = text; li.append(tm, sp); ul.prepend(li);
+  while(ul.children.length > 30) ul.lastChild.remove();
+}
+
+const TIPOS = {temp:'Temperatura alta', agua:'Fuga de agua', puerta:'Puerta abierta'};
+const logAlert = a => addLog((TIPOS[a.tipo] || a.tipo || 'Alerta') + (a.valor !== undefined ? ': ' + a.valor : ''), a.tipo === 'puerta' ? 'warn' : 'bad');
+/* ================= NOTIFICACIONES ================= */
+const N = {on:false, ctx:null, last:{}, sw:null, unread:0, title:document.title, icon:''};
+
+function detalle(id){
+  if(id === 't') return 'Temperatura actual: ' + S.temp.toFixed(1) + ' °C (límite ' + TEMP_MAX + ' °C).';
+  if(id === 'a') return 'El sensor detectó agua en el piso del cuarto de comunicaciones.';
+  if(id === 'p') return 'Se detectó la apertura de la puerta del cuarto de comunicaciones.';
+  return '';
+}
+
+function rackOffline(){
+  setConn('bad', 'Rack desconectado');
+  notify('Rack desconectado', 'La Pico dejó de comunicarse. Revisa la alimentación y el Wi-Fi.', 'bad', 'off');
+}
+
+function makeIcon(){
+  try{
+    const c = document.createElement('canvas'); c.width = c.height = 96;
+    const g = c.getContext('2d');
+    g.fillStyle = '#ff4d5e'; g.beginPath(); g.arc(48, 48, 46, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#fff'; g.font = 'bold 64px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('!', 48, 52);
+    N.icon = c.toDataURL('image/png');
+  }catch(e){}
+}
+
+function unlockAudio(){
+  try{
+    N.ctx = N.ctx || new (window.AudioContext || window.webkitAudioContext)();
+    if(N.ctx.state === 'suspended') N.ctx.resume();
+  }catch(e){}
+}
+
+function beep(level){
+  if(!N.ctx) return;
+  const n = level === 'bad' ? 3 : 1, f = level === 'bad' ? 880 : 660;
+  for(let i = 0; i < n; i++){
+    const o = N.ctx.createOscillator(), g = N.ctx.createGain(), t = N.ctx.currentTime + i * 0.28;
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    o.connect(g); g.connect(N.ctx.destination); o.start(t); o.stop(t + 0.25);
+  }
+}
+
+function toast(title, body, level){
+  const box = $('toasts'), el = document.createElement('div');
+  el.className = 'toast ' + (level || '');
+  el.setAttribute('role', level === 'bad' ? 'alert' : 'status');
+  const d = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'), tm = document.createElement('time');
+  b.textContent = title; sp.textContent = body; tm.textContent = new Date().toLocaleTimeString('es-PE');
+  d.append(b, sp, tm);
+  const x = document.createElement('button'); x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', 'Cerrar aviso');
+  x.onclick = () => el.remove();
+  el.append(d, x); box.prepend(el);
+  while(box.children.length > 4) box.lastChild.remove();
+  setTimeout(() => el.remove(), level === 'bad' ? 12000 : 7000);
+}
+
+function sysNotif(title, body, level, tag){
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  const opt = {body: body, tag: 'rack-' + tag, renotify: true, icon: N.icon || undefined, badge: N.icon || undefined, requireInteraction: level === 'bad'};
+  if(N.sw){ N.sw.showNotification(title, opt).catch(() => {}); return; }
+  try{
+    const n = new Notification(title, opt);
+    n.onclick = () => { window.focus(); n.close(); };
+  }catch(e){}
+}
+
+function notify(title, body, level, id){
+  // Evita repetir el mismo aviso en menos de 60 s (por ejemplo, si la temperatura oscila en el límite)
+  const key = id + ':' + level, now = Date.now();
+  if(N.last[key] && now - N.last[key] < 60000) return;
+  N.last[key] = now;
+  toast(title, body, level);
+  if(!N.on) return;
+  beep(level);
+  if(navigator.vibrate) navigator.vibrate(level === 'bad' ? [300, 150, 300, 150, 300] : [250]);
+  sysNotif(title, body, level, id);
+  if(document.hidden){ N.unread++; document.title = '(' + N.unread + ') ⚠ ' + title; }
+}
+
+function updNotifBtn(){
+  const b = $('notifBtn'), t = b.querySelector('span');
+  const blocked = 'Notification' in window && Notification.permission === 'denied';
+  b.classList.toggle('on', N.on && !blocked);
+  b.classList.toggle('blk', N.on && blocked);
+  t.textContent = !N.on ? 'Activar notificaciones' : blocked ? 'Solo avisos en pantalla' : 'Notificaciones activas';
+}
+
+async function toggleNotif(){
+  if(N.on){
+    N.on = false; localStorage.setItem('rackNotif', '0'); updNotifBtn();
+    toast('Notificaciones desactivadas', 'Los avisos seguirán apareciendo en esta pantalla, sin sonido.', '');
+    return;
+  }
+  unlockAudio();
+  if('Notification' in window){
+    let p = Notification.permission;
+    if(p === 'default'){ try{ p = await Notification.requestPermission(); }catch(e){} }
+    if(p === 'denied') toast('Permiso bloqueado', 'Habilita las notificaciones desde el candado de la barra de direcciones. Mientras tanto, usaré avisos en pantalla y sonido.', 'warn');
+  } else {
+    toast('Sin notificaciones del sistema', 'Este navegador no las admite. Usaré avisos en pantalla, sonido y vibración.', 'warn');
+  }
+  N.on = true; localStorage.setItem('rackNotif', '1'); updNotifBtn();
+  N.last = {};
+  toast('Notificaciones activadas', 'Te avisaré cuando haya una alerta en el rack.', 'ok');
+  beep('warn');
+  sysNotif('Notificaciones activadas', 'Recibirás un aviso cuando haya una alerta en el rack.', 'ok', 'test');
+}
+
+function initNotif(){
+  makeIcon();
+  if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')){
+    navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(r => { N.sw = r; }).catch(() => {});
+  }
+  N.on = localStorage.getItem('rackNotif') === '1';
+  updNotifBtn();
+  $('notifBtn').onclick = toggleNotif;
+  // El navegador solo permite sonido después de que el usuario toca la página
+  document.addEventListener('pointerdown', unlockAudio, {once: true});
+  document.addEventListener('keydown', unlockAudio, {once: true});
+  document.addEventListener('visibilitychange', () => { if(!document.hidden){ N.unread = 0; document.title = N.title; } });
+}
+
+const keep = (a, v) => { a.push(v); if(a.length > MAX_HIST) a.shift(); };
+
+function onTelemetry(d){
+  ['temp', 'hum', 'ventilador'].forEach(k => { if(typeof d[k] === 'string' && d[k].trim() !== '' && isFinite(+d[k])) d[k] = +d[k]; });
+  if(typeof d.temp === 'number'){ S.temp = d.temp; keep(S.hT, d.temp); S.n++; S.sum += d.temp; S.mx = S.mx === null ? d.temp : Math.max(S.mx, d.temp); }
+  if(typeof d.hum === 'number'){ S.hum = d.hum; keep(S.hH, d.hum); }
+  if('puerta' in d){ S.puerta = d.puerta ? 1 : 0; keep(S.hP, S.puerta); }
+  if('agua' in d){ S.agua = d.agua ? 1 : 0; keep(S.hA, S.agua); }
+  if(typeof d.ventilador === 'number') S.fan = d.ventilador;
+  if(typeof d.modo === 'string') S.mode = normModo(d.modo);
+  if(typeof d.estado === 'string') d.estado === 'online' ? setConn('ok', 'Sistema en línea') : rackOffline();
+  if(d.alerta && typeof d.alerta === 'object') logAlert(d.alerta);
+  S.last = Date.now();
+  render();
+}
+
+function onFeed(topic, txt){
+  const m = topic.split('/feeds/'); if(m.length < 2) return;
+  const key = m[1].split('/')[0], v = txt.trim(), n = parseFloat(v);
+  if(key === 'temp' && !isNaN(n)) onTelemetry({temp:n});
+  else if(key === 'hum' && !isNaN(n)) onTelemetry({hum:n});
+  else if(key === 'ventiladores' && !isNaN(n)) onTelemetry({ventilador:n});
+  else if(key === 'agua') onTelemetry({agua: v === '1' ? 1 : 0});
+  else if(key === 'puerta') onTelemetry({puerta: v === '1' ? 1 : 0});
+  else if(key === 'estado') v.toLowerCase() === 'online' ? setConn('ok', 'Sistema en línea') : rackOffline();
+  else if(key === 'alerta') addLog(v, /puerta/i.test(v) ? 'warn' : 'bad');
+  else if(key === 'cmd-ventiladores'){ const u = v.toUpperCase(); if(u === 'AUTO' || u === 'ON' || u === 'OFF'){ S.mode = u.toLowerCase(); render(); } }
+}
+
+function onMessage(topic, payload){
+  if(src === 'aio'){ onFeed(topic, payload.toString()); return; }
+  const sub = topic.slice(prefix.length + 1), txt = payload.toString();
+  try{
+    if(sub === 'telemetria') onTelemetry(JSON.parse(txt));
+    else if(sub === 'alerta') logAlert(JSON.parse(txt));
+    else if(sub === 'estado') txt === 'online' ? setConn('ok', 'Sistema en línea') : rackOffline();
+  }catch(e){ console.warn('Mensaje no válido en', topic, txt); }
+}
+
+function stopAll(){
+  if(client){ client.end(true); client = null; }
+  if(demoTimer){ clearInterval(demoTimer); demoTimer = null; }
+  mode = 'off'; setConn('', 'Sin conexión');
+  $('quickDemoBtn').textContent = 'Demo'; $('quickDemoBtn').classList.remove('act');
+  $('tools').classList.remove('show');
+}
+
+function connect(e){
+  e.preventDefault(); stopAll(); save();
+  if(typeof mqtt === 'undefined'){ setConn('bad', 'Falta la librería MQTT (sin internet)'); return; }
+  const aio = $('src').value === 'aio';
+  const host = $('host').value.trim(); prefix = $('prefix').value.trim() || 'rack01'; aioUser = $('user').value.trim();
+  if(!host){ setConn('warn', 'Escribe el servidor'); return; }
+  if(aio && !aioUser){ setConn('warn', 'Escribe tu username de Adafruit'); return; }
+  mode = 'mqtt'; src = aio ? 'aio' : 'hivemq'; setConn('warn', 'Conectando…');
+  client = mqtt.connect('wss://' + host + ':' + ($('port').value || (aio ? 443 : 8884)) + ($('path').value || '/mqtt'), {
+    username: $('user').value, password: $('pass').value,
+    clientId: 'dashboard_' + Math.random().toString(16).slice(2, 8),
+    reconnectPeriod: aio ? 15000 : 3000, connectTimeout: 8000, keepalive: aio ? 60 : 30, resubscribe: !aio
+  });
+  client.on('connect', () => {
+    setConn('warn', 'Esperando rack…');
+    if(aio){
+      AIO_FEEDS.forEach(f => client.subscribe(aioUser + '/feeds/' + f));
+      ['temp', 'hum', 'ventiladores', 'agua', 'puerta', 'estado'].forEach(f => client.publish(aioUser + '/feeds/' + f + '/get', ''));
+    } else client.subscribe(prefix + '/#', {qos:1});
+  });
+  client.on('reconnect', () => setConn('warn', 'Reconectando…'));
+  client.on('offline', () => setConn('bad', 'Sin conexión al broker'));
+  client.on('error', err => setConn('bad', 'Error: ' + err.message));
+  client.on('message', onMessage);
+}
+
+function sendCmd(v){
+  if(mode === 'mqtt' && client && client.connected){
+    if(src === 'aio'){
+      const u = String(v).toUpperCase();
+      if(u !== 'AUTO' && u !== 'ON' && u !== 'OFF'){ addLog('Con Adafruit IO solo se aceptan Auto, On y Off.', 'warn'); return; }
+      client.publish(aioUser + '/feeds/cmd-ventiladores', u);
+      addLog('Comando enviado al ventilador: ' + u);
+    } else {
+      client.publish(prefix + '/cmd/ventilador', String(v), {qos:1});
+      addLog('Comando enviado al ventilador: ' + v);
+    }
+  } else if(mode === 'demo'){
+    if(v === 'auto' || v === 'on' || v === 'off') S.mode = v; else { S.mode = 'manual'; S.fan = +v; }
+    if(v === 'on') S.fan = 100; if(v === 'off') S.fan = 0;
+    addLog('Comando (demo): ' + v); render();
+  } else addLog('Conecta primero al broker para enviar comandos.', 'warn');
+}
+
+const push = o => onTelemetry(Object.assign({temp:S.temp, hum:S.hum, puerta:S.puerta, agua:S.agua, ventilador:S.fan, modo:S.mode}, o));
+
+function demo(){
+  if(mode === 'demo'){ stopAll(); return; }
+  stopAll(); mode = 'demo'; setConn('ok', 'Demo activa');
+  $('quickDemoBtn').textContent = 'Detener'; $('quickDemoBtn').classList.add('act');
+  $('tools').classList.add('show');
+  Object.assign(S, {temp:24.2, hum:46, puerta:0, agua:0, fan:0, mode:'auto', hT:[], hH:[], hP:[], hA:[], hot:false, since:{}, nlv:{}, n:0, sum:0, mx:null, nAl:0});
+  let tick = 0; push({});
+  demoTimer = setInterval(() => {
+    tick++;
+    const hot = tick % 40 > 24;
+    S.temp = Math.max(21, Math.min(35.5, S.temp + (hot ? .68 : -.45) * Math.random() + (Math.random() - .5) * .22));
+    S.hum = 43 + Math.random() * 6;
+    if(S.mode === 'auto') S.fan = S.temp > 29 ? 100 : S.temp > 26 ? 60 : 0;
+    if(S.temp >= TEMP_MAX && !S.hot) addLog('Temperatura crítica: ' + S.temp.toFixed(1) + ' °C', 'bad');
+    S.hot = S.temp >= TEMP_MAX;
+    push({});
+  }, 1500);
+}
+
+$('injHot').onclick = () => { if(mode !== 'demo') return; if(!S.hot){ addLog('Temperatura crítica: 32.4 °C', 'bad'); S.hot = true; } push({temp:32.4, ventilador: S.mode === 'auto' ? 100 : S.fan}); };
+$('injDoor').onclick = () => { if(mode !== 'demo') return; const n = S.puerta ? 0 : 1; addLog(n ? 'Puerta abierta' : 'Puerta cerrada', n ? 'warn' : ''); push({puerta:n}); };
+$('injWater').onclick = () => { if(mode !== 'demo') return; const n = S.agua ? 0 : 1; addLog(n ? 'Fuga de agua detectada' : 'Sensor de agua seco', n ? 'bad' : ''); push({agua:n}); };
+$('injNorm').onclick = () => { if(mode !== 'demo') return; S.hot = false; addLog('Valores normalizados'); push({temp:23.8, hum:45, puerta:0, agua:0, ventilador:0, modo:'auto'}); };
+
+const openCfg = () => { $('cfgBox').open = true; $('cfgBox').scrollIntoView({behavior:'smooth', block:'center'}); $('host').focus({preventScroll:true}); };
+$('cfgBtn').onclick = openCfg; $('navCfg').onclick = e => { e.preventDefault(); openCfg(); };
+$('cfg').addEventListener('submit', connect);
+$('demoBtn').onclick = demo; $('quickDemoBtn').onclick = demo; $('stopBtn').onclick = stopAll;
+document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => sendCmd(b.dataset.m));
+$('fanRange').addEventListener('change', e => sendCmd(e.target.value));
+
+setInterval(() => {
+  if(!S.last) return;
+  const d = new Date(S.last), s = Math.round((Date.now() - S.last) / 1000), stale = s > STALE_S;
+  const tt = d.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  const dd = d.toLocaleDateString('es-PE', {day:'numeric', month:'short', year:'numeric'});
+  $('age').textContent = stale ? 'Sin datos nuevos hace ' + s + ' s' : 'Última sincronización: ' + dd + ' · ' + tt;
+  $('age').classList.toggle('stale', stale);
+  $('syncT').textContent = tt; $('syncD').textContent = dd;
+}, 1000);
+
+initNotif(); load(); render();
+
+$('src').addEventListener('change', () => {
+  const a = $('src').value === 'aio';
+  $('host').value = a ? 'io.adafruit.com' : ''; $('port').value = a ? 443 : 8884; $('path').value = '/mqtt';
+});
+function tickClock(){
+  const d = new Date();
+  $('clk').textContent = d.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  $('clkD').textContent = d.toLocaleDateString('es-PE', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+}
+tickClock(); setInterval(tickClock, 1000);
+$('pdfBtn').onclick = () => window.print();
+$('presBtn').onclick = () => {
+  const on = !document.body.classList.contains('pres');
+  document.body.classList.toggle('pres', on); $('presBtn').textContent = on ? 'Salir' : 'Presentar';
+  if(on && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+  else if(!on && document.fullscreenElement) document.exitFullscreen();
+};
+document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement && document.body.classList.contains('pres')){ document.body.classList.remove('pres'); $('presBtn').textContent = 'Presentar'; } });
+</script>
+</body>
+</html>
