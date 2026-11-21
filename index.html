@@ -2,7 +2,15 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NEXUS Rack">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>NEXUS Monitor · Cuarto de Comunicaciones</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -443,6 +451,174 @@ body[data-s=bad] .bcn .f{background:rgba(255,51,85,.8);border-color:var(--rd);bo
   @keyframes ring{0%,92%,100%{transform:rotate(0)}94%{transform:rotate(14deg)}96%{transform:rotate(-12deg)}98%{transform:rotate(6deg)}}
 }
 @media print{.card,.kb,.card::after{animation:none!important}}
+/* Demo automática y casilla de recordar */
+body.mqtt-on #quickDemoBtn,body.mqtt-on #tools,body.mqtt-on #demoBtn{display:none!important}
+#forgetBtn{border-color:rgba(255,51,85,.55);color:#ff8fa2}#forgetBtn:hover{border-color:var(--rd);box-shadow:0 0 14px rgba(255,51,85,.25)}#forgetBtn[hidden]{display:none}
+.chk{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-style:normal;color:var(--ink);font-size:14px;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:#fff;flex:none}
+/* =====================================================================
+   ANIMACIÓN EXTRA (nivel máximo) · se desactiva con movimiento reducido
+   ===================================================================== */
+@media (prefers-reduced-motion:no-preference){
+  /* Red de nodos de comunicación en el fondo */
+  #net{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55}
+  /* Luz que sigue al cursor por toda la página */
+  #glowCur{position:fixed;left:0;top:0;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%;pointer-events:none;z-index:-1;
+    background:radial-gradient(closest-side,rgba(255,255,255,.075),transparent 70%);transition:opacity .4s;opacity:0;will-change:transform}
+  #glowCur.on{opacity:1}
+  /* Onda al hacer clic */
+  .rip{position:fixed;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:1.5px solid rgba(255,255,255,.75);pointer-events:none;z-index:70;animation:rip .7s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes rip{to{transform:scale(7);opacity:0;border-width:.5px}}
+  /* Barra de progreso de desplazamiento */
+  #prog{position:fixed;left:0;top:0;height:2px;width:100%;z-index:80;transform-origin:left;transform:scaleX(0);pointer-events:none;
+    background:linear-gradient(90deg,rgba(255,255,255,.2),#fff);box-shadow:0 0 10px rgba(255,255,255,.7)}
+
+  /* Entrada de la barra lateral y la barra superior */
+  .fx .side .logo,.fx .side a,.fx .side .pw{animation:sideIn .8s cubic-bezier(.16,.8,.24,1) backwards}
+  .fx .side a:nth-of-type(1){animation-delay:.15s}.fx .side a:nth-of-type(2){animation-delay:.23s}
+  .fx .side a:nth-of-type(3){animation-delay:.31s}.fx .side a:nth-of-type(4){animation-delay:.39s}.fx .side .pw{animation-delay:.5s}
+  @keyframes sideIn{from{opacity:0;transform:translateX(-24px);filter:blur(4px)}}
+  .fx .bar{animation:barIn .9s cubic-bezier(.16,.8,.24,1) backwards}
+  @keyframes barIn{from{opacity:0;transform:translateY(-22px)}}
+
+  /* Título: se revela con una cortina de luz; subtítulo tipo máquina de escribir */
+  .fx .title.in h1{animation:wipe 1.3s cubic-bezier(.7,0,.2,1) .15s backwards,shine 7s ease-in-out 1.5s infinite}
+  @keyframes wipe{from{clip-path:inset(0 100% 0 0);filter:blur(6px)}to{clip-path:inset(0 0 0 0);filter:blur(0)}}
+  .title p.typing::after{content:"";display:inline-block;width:1px;height:1em;margin-left:3px;vertical-align:-2px;background:var(--mu);animation:caret .8s steps(1) infinite}
+  @keyframes caret{50%{opacity:0}}
+
+  /* Botones magnéticos */
+  .mag{transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .2s,background .2s}
+
+  /* Gráficos que se dibujan al cargar */
+  .drawing #spark polyline,.drawing #sparkH polyline{stroke-dasharray:1200;animation:draw 1.8s cubic-bezier(.4,0,.2,1) both}
+  @keyframes draw{from{stroke-dashoffset:1200}to{stroke-dashoffset:0}}
+
+  /* Indicadores en alerta: un trazo de luz gira alrededor del borde */
+  .kpi.bd::after,.kpi.wr::after{background:conic-gradient(from var(--ang,0deg),transparent 0 70%,var(--c) 85%,transparent 100%),linear-gradient(135deg,color-mix(in srgb,var(--c) 60%,transparent),color-mix(in srgb,var(--c) 20%,transparent));animation:orbit 2.4s linear infinite!important}
+  @property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+  @keyframes orbit{to{--ang:360deg}}
+
+  /* Celdas del resumen que se elevan */
+  .es div{transition:transform .3s cubic-bezier(.2,.8,.2,1),background .3s}
+  .es div:hover{transform:translateY(-3px);background:rgba(255,255,255,.06)}
+
+  /* Avisos que entran con rebote */
+  .toast{animation:toastIn .6s cubic-bezier(.2,1.4,.4,1)!important}
+  @keyframes toastIn{from{opacity:0;transform:translateX(60px) scale(.94)}}
+
+  /* Flujo de aire dentro del rack: velocidad según el ventilador */
+  .air{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .air i{position:absolute;bottom:-8px;width:2px;height:14px;border-radius:2px;background:linear-gradient(transparent,rgba(255,255,255,.55));opacity:0;
+    animation:airUp calc(var(--t) * var(--slow,1)) linear var(--dl) infinite}
+  @keyframes airUp{0%{transform:translateY(0);opacity:0}15%{opacity:var(--o)}85%{opacity:var(--o)}100%{transform:translateY(-320px) translateX(var(--dx));opacity:0}}
+  .r3[data-air="off"] .air{opacity:.15}
+  body[data-s=bad] .air i{background:linear-gradient(transparent,rgba(255,51,85,.7))}
+  body[data-s=warn] .air i{background:linear-gradient(transparent,rgba(255,170,0,.7))}
+
+  /* Dona: late cuando el ventilador está encendido */
+  .donut.run{animation:beat 1.6s ease-in-out infinite}
+  @keyframes beat{50%{filter:drop-shadow(0 0 18px rgba(255,255,255,.35))}}
+
+  /* Píldora de estado: el texto entra suave cuando cambia */
+  #connTxt.tk{animation:tick .5s cubic-bezier(.2,.8,.2,1)}
+}
+@media print{#net,#glowCur,#prog,.air{display:none!important}}
+/* ===================== ETIQUETA DEL GRÁFICO (sin recuadro blanco) ===================== */
+.ch svg .vl{font-family:var(--fm);font-weight:500;paint-order:stroke;stroke:#000;stroke-width:5px;stroke-linejoin:round}
+
+/* ===================== MÓVIL Y APP (Android / iOS) ===================== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100dvh;-webkit-tap-highlight-color:transparent}
+.tabbar{display:none}
+@media (max-width:999px){
+  .main{padding:calc(14px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(100px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+  .tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;
+    padding:6px;border-radius:20px;background:rgba(14,14,14,.78);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);
+    border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 40px rgba(0,0,0,.7)}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:14px;color:var(--mu);text-decoration:none;font-size:11.5px;transition:background .25s,color .25s}
+  .tabbar a .ic{width:22px;height:22px}
+  .tabbar a.on{color:#fff;background:rgba(255,255,255,.1)}
+  #toasts{top:calc(12px + env(safe-area-inset-top));right:12px;left:12px;width:auto}
+}
+@media (max-width:700px){
+  .bar{gap:8px;padding:10px 12px}
+  .bar .mb{order:0;flex:1;font-size:17px;white-space:nowrap}
+  .bar .bell{order:1}
+  .bar .pill{order:2;font-size:13px}
+  .bar .clock{order:3;margin-left:auto}.clock b{font-size:18px}.clock span{display:none}
+  #age{order:4;width:100%;font-size:12px}
+  .bar .sp{display:none}
+  .bar>button{order:5;flex:1 1 auto;font-size:13px;padding:9px 12px}
+  #presBtn{display:none}
+  #tools{gap:6px}#tools button{flex:1 1 auto}
+  .title{margin:20px 0 16px}
+  .title p{font-size:14px}
+  .gen{min-width:0;width:100%}
+  .exec{padding:18px}
+  .exec p{font-size:16px}
+  .es b{font-size:20px}
+  .sh{font-size:19px;margin:26px 0 12px}
+  .g4{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{flex-direction:column;align-items:flex-start;gap:10px;padding:16px 14px 40px}
+  .kb{width:40px;height:40px;border-radius:10px}.kb .ic{width:21px;height:21px}
+  .kpi .v{font-size:25px}.kpi .v small{font-size:15px}
+  .kpi .l{font-size:12px}.chip{font-size:11.5px}
+  .r3{min-height:270px}
+  .donut{width:140px;height:140px}.dc b{font-size:30px}
+  .card{padding:16px}
+  select,input[type=text],input[type=password],input[type=number]{font-size:16px}   /* evita el zoom automático de iPhone */
+  footer{flex-direction:column}
+  #dust i:nth-child(n+30){display:none}
+}
+@media (max-width:360px){.g4{grid-template-columns:1fr}}
+@media (display-mode:standalone) and (min-width:1000px){.main{padding-top:calc(20px + env(safe-area-inset-top))}}
+
+/* ===================== REPORTE DIARIO (solo al imprimir / guardar PDF) ===================== */
+#report{display:none}
+@media print{
+  @page{size:A4 portrait;margin:13mm 13mm 15mm}
+  html,body{background:#fff!important;color:#111!important}
+  body::before{display:none!important}
+  body>*:not(#report){display:none!important}
+  #report{display:block!important;font:400 10.5pt/1.5 'Literata',Georgia,serif;color:#111;font-variant-numeric:tabular-nums lining-nums}
+  #report *{animation:none!important;text-shadow:none!important}
+  .rp-h{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;padding-bottom:12px;border-bottom:2px solid #111}
+  .rp-brand{display:flex;align-items:center;gap:12px}
+  .rp-brand svg{width:38px;height:38px}
+  .rp-brand b{display:block;font:600 15pt/1.05 'Literata',serif;letter-spacing:-.01em}
+  .rp-brand span{font-style:italic;color:#555;font-size:9.5pt}
+  .rp-meta{text-align:right;font-size:9pt;color:#444;line-height:1.45}
+  .rp-meta b{display:block;font:600 13pt 'Literata',serif;color:#111}
+  #report .rp-title{margin:16px 0 4px;font:500 21pt/1.1 'Literata',serif;letter-spacing:-.02em;background:none!important;color:#111!important;-webkit-text-fill-color:#111;clip-path:none!important;filter:none!important}
+  .rp-sub{margin:0 0 12px;color:#555;font-style:italic}
+  .rp-state{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border:1px solid #111;border-radius:999px;font-size:9.5pt}
+  .rp-state i{width:9px;height:9px;border-radius:50%;background:#111}
+  .rp-state.warn{border-color:#c77d00}.rp-state.warn i{background:#e09000}
+  .rp-state.bad{border-color:#c4122f}.rp-state.bad i{background:#d7263d}
+  .rp h2,#report h2{font:600 12.5pt 'Literata',serif;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #ccc;break-after:avoid}
+  .rp-sum{margin:0;font-size:11pt;line-height:1.6}
+  .rp-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+  .rp-k{border:1px solid #cfcfcf;border-radius:8px;padding:9px 11px;break-inside:avoid}
+  .rp-k span{display:block;font-size:8.5pt;color:#666;font-style:italic}
+  .rp-k b{display:block;font:600 16pt/1.2 'Literata',serif}
+  .rp-k small{font-size:8.5pt;color:#555}
+  .rp-k.rp-al{border-color:#d7263d}.rp-k.rp-al b{color:#c4122f}
+  #report .rp-k{box-shadow:none;background:#fff}
+  .rp-chart{break-inside:avoid}
+  .rp-chart svg{width:100%;height:auto;display:block}
+  .rp-chart .cap{font-size:8.5pt;color:#666;font-style:italic;margin-top:2px}
+  .rp-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  table.rp-t{width:100%;border-collapse:collapse;font-size:9.5pt}
+  .rp-t th{text-align:left;font-weight:600;border-bottom:1.5px solid #111;padding:5px 6px}
+  .rp-t td{border-bottom:1px solid #e2e2e2;padding:5px 6px;vertical-align:top}
+  .rp-t tr{break-inside:avoid}
+  .rp-t td.lv,.rp-t td:first-child{white-space:nowrap}
+  .rp-t .bad{color:#c4122f;font-weight:600}.rp-t .warn{color:#b06e00;font-weight:600}
+  .rp-obs{margin:0;padding-left:18px}.rp-obs li{margin:3px 0}
+  .rp-note{margin-top:6px;font-size:8.5pt;color:#777;font-style:italic}
+  .rp-f{margin-top:20px;padding-top:8px;border-top:1px solid #ccc;display:flex;justify-content:space-between;gap:12px;font-size:8.5pt;color:#666}
+}
 </style>
 </head>
 <body>
@@ -547,9 +723,10 @@ body[data-s=bad] .bcn .f{background:rgba(255,51,85,.8);border-color:var(--rd);bo
       <label>Usuario (HiveMQ) o username (Adafruit)<input type="text" id="user"></label>
       <label>Contraseña (HiveMQ) o Active Key (Adafruit)<input type="password" id="pass"></label>
       <label>Prefijo de topics (solo HiveMQ)<input type="text" id="prefix" value="rack01"></label>
-      <div class="full"><button type="submit" class="on">Conectar</button><button type="button" id="demoBtn">Modo demo</button><button type="button" id="stopBtn">Desconectar</button></div>
+      <label class="chk"><input type="checkbox" id="remember"><span>Recordar la Key en este dispositivo y conectar automáticamente al abrir la página</span></label>
+      <div class="full"><button type="submit" class="on">Conectar</button><button type="button" id="demoBtn">Modo demo</button><button type="button" id="stopBtn">Desconectar</button><button type="button" id="forgetBtn" hidden>Borrar Key guardada</button></div>
     </form>
-    <p class="note">La contraseña y la Active Key no se guardan en el navegador. HiveMQ: el usuario necesita suscripción a rack01/# y publicación en rack01/cmd/ventilador. Adafruit IO: escribe tu username y tu Active Key; el servidor se rellena solo (io.adafruit.com, puerto 443). No escribas la Key dentro del archivo ni la subas a GitHub.</p>
+    <p class="note">La contraseña y la Active Key solo se guardan si marcas "Recordar", y únicamente en el navegador de este dispositivo (nunca en GitHub). Mientras estés conectado, la demo se oculta; vuelve a aparecer al presionar "Desconectar". Usa "Borrar Key guardada" para que este sitio olvide tu Key. HiveMQ: el usuario necesita suscripción a rack01/# y publicación en rack01/cmd/ventilador. Adafruit IO: escribe tu username y tu Active Key; el servidor se rellena solo (io.adafruit.com, puerto 443). No escribas la Key dentro del archivo ni la subas a GitHub.</p>
   </details>
   <footer><span><b>NEXUS MONITOR</b> · Centro de monitoreo de infraestructura crítica</span><span>Telemetría en tiempo real · Raspberry Pi Pico 2 W · MQTT · Adafruit IO / HiveMQ Cloud</span></footer>
 </div>
@@ -561,6 +738,8 @@ const $ = id => document.getElementById(id);
 const TEMP_MAX = 30, TEMP_WARN = 28, MAX_HIST = 60, STALE_S = 30;
 const S = {temp:null, hum:null, puerta:null, agua:null, fan:null, mode:'--', last:0, hT:[], hH:[], hP:[], hA:[], hot:false, since:{}, nlv:{}, n:0, sum:0, mx:null, nAl:0};
 let client = null, demoTimer = null, mode = 'off', prefix = 'rack01', src = 'hivemq', aioUser = '';
+let picoOn = false, picoSeen = 0, connAt = 0, picoLive = false;   // detección automática de la Pico
+let histLoaded = false;
 const AIO_FEEDS = ['temp', 'hum', 'ventiladores', 'agua', 'puerta', 'estado', 'alerta', 'cmd-ventiladores'];
 const hm = () => new Date().toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit'});
 
@@ -604,14 +783,14 @@ function chart(id, a, lo, hi, col, unit, thr){
   if(a.length > 1){
     const p = pts(a, lo, hi, L, R, T, B), l = p[p.length - 1], v = a[a.length - 1].toFixed(1) + unit;
     const bx = Math.min(R - 46, l[0] - 23), by = Math.max(T, l[1] - 30);
-    s += '<polygon points="' + L + ',' + B + ' ' + path(p) + ' ' + l[0].toFixed(1) + ',' + B + '" fill="url(#c' + id + ')"/><polyline points="' + path(p) + '" fill="none" stroke="' + col + '" stroke-width="2.2" stroke-linejoin="round"/>';
-    s += '<circle cx="' + l[0].toFixed(1) + '" cy="' + l[1].toFixed(1) + '" r="4" style="fill:var(--pp)" stroke="' + col + '" stroke-width="2"/><rect x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) + '" width="46" height="20" rx="2" style="fill:var(--ink)" stroke="' + col + '"/><text x="' + (bx + 23).toFixed(1) + '" y="' + (by + 14).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--pp)">' + v + '</text>';
+    s += '<polygon points="' + p[0][0].toFixed(1) + ',' + B + ' ' + path(p) + ' ' + l[0].toFixed(1) + ',' + B + '" fill="url(#c' + id + ')"/><polyline points="' + path(p) + '" fill="none" stroke="' + col + '" stroke-width="2.2" stroke-linejoin="round"/>';
+    s += '<circle cx="' + l[0].toFixed(1) + '" cy="' + l[1].toFixed(1) + '" r="4" style="fill:var(--pp)" stroke="' + col + '" stroke-width="2"/><text class="vl" x="' + (bx + 23).toFixed(1) + '" y="' + (by + 14).toFixed(1) + '" text-anchor="middle" font-size="12.5" style="fill:var(--ink)">' + v + '</text>';
   }
   $(id).innerHTML = s;
 }
 
-function load(){ try{ const c = JSON.parse(localStorage.getItem('rackcfg') || '{}'); ['src','host','port','path','user','prefix'].forEach(k => { if(c[k]) $(k).value = c[k]; }); }catch(e){} }
-function save(){ try{ const c = {}; ['src','host','port','path','user','prefix'].forEach(k => c[k] = $(k).value); localStorage.setItem('rackcfg', JSON.stringify(c)); }catch(e){} }
+function load(){ try{ const c = JSON.parse(localStorage.getItem('rackcfg') || '{}'); ['src','host','port','path','user','prefix'].forEach(k => { if(c[k]) $(k).value = c[k]; }); const k = localStorage.getItem('rackKey'); if(k){ $('pass').value = k; $('remember').checked = true; } }catch(e){} }
+function save(){ try{ const c = {}; ['src','host','port','path','user','prefix'].forEach(k => c[k] = $(k).value); localStorage.setItem('rackcfg', JSON.stringify(c)); if($('remember').checked && $('pass').value) localStorage.setItem('rackKey', $('pass').value); else localStorage.removeItem('rackKey'); }catch(e){} }
 function setConn(kind, txt){ $('connDot').className = 'dot ' + kind; $('connTxt').textContent = txt; }
 
 function setFans(){
@@ -862,6 +1041,7 @@ function onTelemetry(d){
   if(typeof d.estado === 'string') d.estado === 'online' ? setConn('ok', 'Sistema en línea') : rackOffline();
   if(d.alerta && typeof d.alerta === 'object') logAlert(d.alerta);
   S.last = Date.now();
+  if(typeof recordDay === 'function') recordDay();
   render();
 }
 
@@ -879,6 +1059,7 @@ function onFeed(topic, txt){
 }
 
 function onMessage(topic, payload){
+  trackPico(topic, payload.toString());
   if(src === 'aio'){ onFeed(topic, payload.toString()); return; }
   const sub = topic.slice(prefix.length + 1), txt = payload.toString();
   try{
@@ -888,10 +1069,58 @@ function onMessage(topic, payload){
   }catch(e){ console.warn('Mensaje no válido en', topic, txt); }
 }
 
+/* ===== Detección automática de la Pico =====
+   La Pico cuenta como conectada cuando llegan datos reales o su estado "online".
+   Se ignoran los primeros 6 s tras conectar, porque Adafruit reenvía los últimos
+   valores guardados aunque la Pico esté apagada. */
+function trackPico(topic, txt){
+  const t = topic.toLowerCase(), v = txt.trim().toLowerCase();
+  if(t.includes('cmd')) return;                       // comandos enviados desde la web
+  if(t.endsWith('/estado')){
+    if(v === 'offline'){ picoOn = false; updDemo(); return; }
+    if(v !== 'online') return;
+  }
+  if(Date.now() - connAt < 6000) return;              // valores antiguos reenviados al conectar
+  picoOn = true; picoSeen = Date.now(); updDemo();
+}
+/* La demo solo se muestra cuando no hay conexión: al conectar se oculta y
+   vuelve a aparecer únicamente al presionar "Desconectar". */
+function syncDemoUI(){ document.body.classList.toggle('mqtt-on', mode === 'mqtt'); }
+function updDemo(){
+  syncDemoUI();
+  const live = mode === 'mqtt' && picoOn && Date.now() - picoSeen < 60000;
+  if(live === picoLive) return;
+  picoLive = live;
+  document.body.classList.toggle('pico-live', live);
+  if(live) toast('Pico conectada', 'Mostrando datos reales en vivo.', 'ok');
+  else if(mode === 'mqtt') toast('Pico sin datos', 'No llegan datos de la Pico. Revisa que esté encendida y con Wi-Fi.', 'warn');
+}
+setInterval(updDemo, 2000);
+
+/* ===== Historial: últimas lecturas guardadas en Adafruit IO =====
+   Se pide una sola vez por conexión, para que los gráficos no empiecen vacíos. */
+function loadHistory(user, key){
+  if(!user || !key || !window.fetch) return;
+  const get = feed => fetch('https://io.adafruit.com/api/v2/' + encodeURIComponent(user) + '/feeds/' + feed + '/data?limit=' + MAX_HIST, {headers:{'X-AIO-Key': key}})
+    .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(rows => rows.map(x => parseFloat(x.value)).filter(v => isFinite(v)).reverse());   // de la más antigua a la más reciente
+  Promise.all([get('temp'), get('hum')]).then(([t, h]) => {
+    if(mode !== 'mqtt') return;
+    // Se conserva lo que ya llegó en vivo durante la carga
+    S.hT = t.concat(S.hT).slice(-MAX_HIST);
+    S.hH = h.concat(S.hH).slice(-MAX_HIST);
+    S.n = S.hT.length; S.sum = S.hT.reduce((a, b) => a + b, 0); S.mx = S.hT.length ? Math.max(...S.hT) : null;
+    if(S.temp === null && t.length) S.temp = t[t.length - 1];
+    if(S.hum === null && h.length) S.hum = h[h.length - 1];
+    render();
+    if(t.length || h.length) toast('Historial cargado', 'Se cargaron las últimas ' + Math.max(t.length, h.length) + ' lecturas guardadas en Adafruit IO.', 'ok');
+  }).catch(() => { /* sin historial: los gráficos se llenan con los datos en vivo */ });
+}
+
 function stopAll(){
   if(client){ client.end(true); client = null; }
   if(demoTimer){ clearInterval(demoTimer); demoTimer = null; }
-  mode = 'off'; setConn('', 'Sin conexión');
+  mode = 'off'; picoOn = false; setConn('', 'Sin conexión'); syncDemoUI();
   $('quickDemoBtn').textContent = 'Demo'; $('quickDemoBtn').classList.remove('act');
   $('tools').classList.remove('show');
 }
@@ -904,6 +1133,9 @@ function connect(e){
   if(!host){ setConn('warn', 'Escribe el servidor'); return; }
   if(aio && !aioUser){ setConn('warn', 'Escribe tu username de Adafruit'); return; }
   mode = 'mqtt'; src = aio ? 'aio' : 'hivemq'; setConn('warn', 'Conectando…');
+  connAt = Date.now(); picoOn = false; picoSeen = 0; syncDemoUI();
+  histLoaded = false;
+  if(aio) Object.assign(S, {hT:[], hH:[], n:0, sum:0, mx:null});   // sesión nueva: se reemplaza por el historial real
   client = mqtt.connect('wss://' + host + ':' + ($('port').value || (aio ? 443 : 8884)) + ($('path').value || '/mqtt'), {
     username: $('user').value, password: $('pass').value,
     clientId: 'dashboard_' + Math.random().toString(16).slice(2, 8),
@@ -911,6 +1143,7 @@ function connect(e){
   });
   client.on('connect', () => {
     setConn('warn', 'Esperando rack…');
+    if(aio && !histLoaded){ histLoaded = true; loadHistory(aioUser, $('pass').value); }
     if(aio){
       AIO_FEEDS.forEach(f => client.subscribe(aioUser + '/feeds/' + f));
       ['temp', 'hum', 'ventiladores', 'agua', 'puerta', 'estado'].forEach(f => client.publish(aioUser + '/feeds/' + f + '/get', ''));
@@ -918,7 +1151,18 @@ function connect(e){
   });
   client.on('reconnect', () => setConn('warn', 'Reconectando…'));
   client.on('offline', () => setConn('bad', 'Sin conexión al broker'));
-  client.on('error', err => setConn('bad', 'Error: ' + err.message));
+  client.on('error', err => {
+    // Código 4 o 5 del broker = usuario o Key incorrectos: no tiene sentido reintentar
+    const auth = err && (err.code === 4 || err.code === 5 || /not authori[sz]ed|bad user ?name or password/i.test(err.message || ''));
+    if(auth){
+      stopAll();
+      setConn('bad', 'Usuario o Key incorrectos');
+      toast('No se pudo conectar', 'El usuario o la Key no son correctos. Revisa ambos en Configuración y vuelve a conectar.' + (hasKey() ? ' La Key guardada parece incorrecta: bórrala o reemplázala.' : ''), 'bad');
+      $('cfgBox').open = true;
+      return;
+    }
+    setConn('bad', 'Error: ' + err.message);
+  });
   client.on('message', onMessage);
 }
 
@@ -984,6 +1228,19 @@ setInterval(() => {
 }, 1000);
 
 initNotif(); load(); render();
+// Conexión automática si el usuario eligió recordar la Key en este dispositivo
+if($('remember').checked && $('pass').value && $('host').value){ setTimeout(() => connect({preventDefault(){}}), 400); }
+function hasKey(){ try{ return !!localStorage.getItem('rackKey'); }catch(e){ return false; } }
+function updForget(){ $('forgetBtn').hidden = !hasKey(); }
+function forgetKey(){
+  try{ localStorage.removeItem('rackKey'); }catch(e){}
+  $('pass').value = ''; $('remember').checked = false; updForget();
+  toast('Key borrada', 'Este sitio ya no guarda tu Key en este dispositivo. La próxima vez tendrás que escribirla.', 'ok');
+}
+$('forgetBtn').addEventListener('click', forgetKey);
+$('remember').addEventListener('change', () => { if(!$('remember').checked){ try{ localStorage.removeItem('rackKey'); }catch(e){} updForget(); } });
+$('cfg').addEventListener('submit', () => setTimeout(updForget, 0));
+updForget(); syncDemoUI();
 
 $('src').addEventListener('change', () => {
   const a = $('src').value === 'aio';
@@ -1128,5 +1385,284 @@ document.addEventListener('fullscreenchange', () => { if(!document.fullscreenEle
 })();
 </script>
 
+<script>
+/* ===== Animación extra: red de fondo, cursor, ondas, escritura y más ===== */
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const $ = id => document.getElementById(id);
+
+  // Barra de progreso y luz del cursor
+  const prog = document.createElement('div'); prog.id = 'prog'; document.body.appendChild(prog);
+  const glow = document.createElement('div'); glow.id = 'glowCur'; document.body.appendChild(glow);
+  const onScroll = () => { const h = document.documentElement.scrollHeight - innerHeight; prog.style.transform = 'scaleX(' + (h > 0 ? scrollY / h : 0) + ')'; };
+  addEventListener('scroll', onScroll, {passive: true}); onScroll();
+  let mx = -999, my = -999;
+  addEventListener('pointermove', e => {
+    if(e.pointerType !== 'mouse') return;
+    mx = e.clientX; my = e.clientY; glow.classList.add('on');
+    glow.style.transform = 'translate(' + mx + 'px,' + my + 'px)';
+  }, {passive: true});
+  document.addEventListener('mouseleave', () => glow.classList.remove('on'));
+
+  // Onda en cada clic o toque
+  addEventListener('pointerdown', e => {
+    const r = document.createElement('span'); r.className = 'rip';
+    r.style.left = e.clientX + 'px'; r.style.top = e.clientY + 'px';
+    document.body.appendChild(r); setTimeout(() => r.remove(), 750);
+  }, {passive: true});
+
+  // Red de nodos de comunicación (reacciona al cursor)
+  const cv = document.createElement('canvas'); cv.id = 'net'; cv.setAttribute('aria-hidden', 'true'); document.body.prepend(cv);
+  const g = cv.getContext('2d'); let W, H, dpr, nodes = [];
+  const size = () => {
+    dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(70, Math.max(28, W * H / 26000)));
+    nodes = Array.from({length: n}, () => ({x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25, r: Math.random() * 1.4 + .6}));
+  };
+  size(); addEventListener('resize', size);
+  (function loop(){
+    requestAnimationFrame(loop);
+    if(document.hidden) return;
+    g.clearRect(0, 0, W, H);
+    const alert = document.body.dataset.s, col = alert === 'bad' ? '255,51,85' : alert === 'warn' ? '255,170,0' : '255,255,255';
+    for(const p of nodes){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0 || p.x > W) p.vx *= -1; if(p.y < 0 || p.y > H) p.vy *= -1;
+      const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
+      if(d < 140 && d > 0){ p.x += dx / d * .6; p.y += dy / d * .6; }
+    }
+    for(let i = 0; i < nodes.length; i++){
+      const a = nodes[i];
+      for(let j = i + 1; j < nodes.length; j++){
+        const b = nodes[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+        if(d < 150){ g.strokeStyle = 'rgba(' + col + ',' + (.16 * (1 - d / 150)).toFixed(3) + ')'; g.lineWidth = 1; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
+      }
+      const dm = Math.hypot(a.x - mx, a.y - my);
+      if(dm < 180){ g.strokeStyle = 'rgba(' + col + ',' + (.3 * (1 - dm / 180)).toFixed(3) + ')'; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(mx, my); g.stroke(); }
+      g.fillStyle = 'rgba(' + col + ',.55)'; g.beginPath(); g.arc(a.x, a.y, a.r, 0, 6.283); g.fill();
+    }
+  })();
+
+  // Subtítulo que se escribe solo
+  const sub = document.querySelector('.title p');
+  if(sub){
+    const full = sub.textContent; sub.textContent = ''; sub.classList.add('typing');
+    let i = 0;
+    setTimeout(function type(){
+      sub.textContent = full.slice(0, ++i);
+      if(i < full.length) setTimeout(type, 28 + Math.random() * 30); else setTimeout(() => sub.classList.remove('typing'), 1600);
+    }, 900);
+  }
+
+  // Botones magnéticos
+  document.querySelectorAll('.bar button, .seg button, .full button, #tools button').forEach(b => {
+    b.classList.add('mag');
+    b.addEventListener('pointermove', e => {
+      if(e.pointerType !== 'mouse') return;
+      const r = b.getBoundingClientRect();
+      b.style.transform = 'translate(' + ((e.clientX - r.left - r.width / 2) * .18).toFixed(1) + 'px,' + ((e.clientY - r.top - r.height / 2) * .28).toFixed(1) + 'px)';
+    });
+    b.addEventListener('pointerleave', () => { b.style.transform = ''; });
+  });
+
+  // Gráficos que se dibujan al cargar y al llegar el historial
+  const draw = () => { document.body.classList.add('drawing'); clearTimeout(draw.t); draw.t = setTimeout(() => document.body.classList.remove('drawing'), 2000); };
+  draw();
+  const ts = document.getElementById('toasts');
+  if(ts) new MutationObserver(() => { const f = ts.firstElementChild; if(f && /Historial cargado/.test(f.textContent)) draw(); }).observe(ts, {childList: true});
+
+  // Flujo de aire en el rack, más rápido cuanto mayor es la velocidad del ventilador
+  const r3 = $('r3');
+  if(r3){
+    const air = document.createElement('div'); air.className = 'air'; air.setAttribute('aria-hidden', 'true');
+    let h = '';
+    for(let i = 0; i < 26; i++) h += '<i style="left:' + (8 + Math.random() * 84).toFixed(1) + '%;--t:' + (2.2 + Math.random() * 2.4).toFixed(2) + 's;--dl:-' + (Math.random() * 4).toFixed(2) + 's;--o:' + (.2 + Math.random() * .5).toFixed(2) + ';--dx:' + (Math.random() * 30 - 15).toFixed(0) + 'px"></i>';
+    air.innerHTML = h; r3.appendChild(air);
+    const fanEl = $('fan'), donut = document.querySelector('.donut');
+    const upd = () => {
+      const p = parseFloat(fanEl && fanEl.textContent) || 0;
+      r3.dataset.air = p > 0 ? 'on' : 'off';
+      r3.style.setProperty('--slow', p > 0 ? (2.2 - p / 100 * 1.6).toFixed(2) : '3');
+      if(donut) donut.classList.toggle('run', p > 0);
+    };
+    if(fanEl) new MutationObserver(upd).observe(fanEl, {childList: true, characterData: true, subtree: true});
+    upd();
+  }
+
+  // Texto de estado que entra suave al cambiar
+  const ct = $('connTxt');
+  if(ct){ let prev = ct.textContent; new MutationObserver(() => { if(ct.textContent !== prev){ prev = ct.textContent; ct.classList.remove('tk'); void ct.offsetWidth; ct.classList.add('tk'); } }).observe(ct, {childList: true, characterData: true, subtree: true}); }
+})();
+</script>
+
+<script>
+/* =====================================================================
+   REPORTE DIARIO EN PDF
+   Fuente de datos: Adafruit IO (si estás conectado con tu Key) o, si no,
+   las lecturas guardadas en este dispositivo durante el día.
+   ===================================================================== */
+const DAYKEY = 'rackday';
+let DAY = [];            // lecturas del día en este dispositivo
+let reportAt = 0;
+const dayStr = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const startOfDay = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+try{ const o = JSON.parse(localStorage.getItem(DAYKEY) || 'null'); if(o && o.date === dayStr(new Date())) DAY = o.rows || []; }catch(e){}
+
+function recordDay(){
+  if(mode === 'off') return;
+  const today = dayStr(new Date());
+  if(DAY.length && dayStr(new Date(DAY[DAY.length - 1].t)) !== today) DAY = [];
+  DAY.push({t: Date.now(), temp: S.temp, hum: S.hum, p: S.puerta, a: S.agua, f: S.fan, demo: mode === 'demo' ? 1 : 0});
+  if(DAY.length > 4000) DAY.splice(0, DAY.length - 4000);
+  if(mode === 'mqtt' && DAY.length % 5 === 0){
+    try{ localStorage.setItem(DAYKEY, JSON.stringify({date: today, rows: DAY.filter(r => !r.demo)})); }catch(e){}
+  }
+}
+
+const rpEsc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rpHm = t => new Date(t).toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit'});
+const rpDur = ms => { if(ms > 0 && ms < 60000) return 'menos de 1 min'; const m = Math.round(ms / 60000); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + (m % 60) + ' min'; };
+const rpStats = a => a.length ? {min: Math.min(...a), max: Math.max(...a), avg: a.reduce((x, y) => x + y, 0) / a.length} : null;
+const rpRises = s => { let n = 0, prev = 0; s.forEach(x => { if(x.v && !prev) n++; prev = x.v; }); return n; };
+
+function collectLocal(){
+  const t0 = startOfDay().getTime();
+  const rows = DAY.filter(r => r.t >= t0);
+  const demo = rows.some(r => r.demo);
+  const ser = k => rows.filter(r => typeof r[k] === 'number').map(r => ({t: r.t, v: r[k]}));
+  const events = [...document.querySelectorAll('#log li')].map(li => {
+    const tm = li.querySelector('time'), tx = li.querySelector('span') || li;
+    return {time: tm ? tm.textContent : '', text: (tx.textContent || '').trim(), lv: li.className || ''};
+  }).filter(e => e.text && !/Aquí aparecerán/.test(e.text));
+  return {source: demo ? 'Demostración (datos simulados)' : (rows.length ? 'Lecturas registradas en este dispositivo' : 'Sin lecturas registradas hoy'),
+          demo, temp: ser('temp'), hum: ser('hum'), puerta: ser('p'), agua: ser('a'), events, exactEvents: false};
+}
+
+function collectAdafruit(user, key){
+  const base = 'https://io.adafruit.com/api/v2/' + encodeURIComponent(user) + '/feeds/';
+  const start = startOfDay().toISOString(), end = new Date().toISOString();
+  const H = {headers: {'X-AIO-Key': key}};
+  const js = u => fetch(u, H).then(r => { if(!r.ok) throw new Error(r.status); return r.json(); });
+  const chart = f => js(base + f + '/data/chart?start_time=' + start + '&end_time=' + end + '&resolution=5')
+      .then(o => (o.data || []).map(x => ({t: Date.parse(x[0]), v: parseFloat(x[1])})).filter(x => isFinite(x.v)));
+  const data = (f, n) => js(base + f + '/data?start_time=' + start + '&limit=' + n)
+      .then(rows => rows.map(x => ({t: Date.parse(x.created_at), raw: String(x.value)})).reverse());
+  const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 9000));
+  return Promise.race([Promise.all([chart('temp'), chart('hum'), data('puerta', 500), data('agua', 500), data('alerta', 300)]), timeout])
+    .then(([t, h, p, a, al]) => ({
+      source: 'Adafruit IO · cuenta ' + user + ' (promedios cada 5 min)', demo: false,
+      temp: t, hum: h,
+      puerta: p.map(x => ({t: x.t, v: x.raw.trim() === '1' ? 1 : 0})),
+      agua: a.map(x => ({t: x.t, v: x.raw.trim() === '1' ? 1 : 0})),
+      events: al.map(x => ({time: rpHm(x.t), text: x.raw, lv: /puerta/i.test(x.raw) ? 'warn' : 'bad'})),
+      exactEvents: true
+    }));
+}
+
+function rpChart(series, lo, hi, thr, unit, label){
+  const W = 700, Hh = 190, L = 40, R = 690, T = 10, B = 160;
+  let t0 = startOfDay().getTime(), t1 = t0 + 864e5, step = 3 * 36e5;
+  if(series.length > 1 && series[series.length - 1].t - series[0].t < 3 * 36e5){
+    // Pocos datos: se muestra solo el tramo con lecturas, con marcas de tiempo más finas
+    const span = Math.max(Date.now(), series[series.length - 1].t) - series[0].t;
+    step = span < 20 * 6e4 ? 2 * 6e4 : span < 60 * 6e4 ? 10 * 6e4 : 30 * 6e4;
+    t0 = Math.floor(series[0].t / step) * step; t1 = Math.ceil((Math.max(Date.now(), series[series.length - 1].t) + 1) / step) * step;
+  }
+  const x = t => L + (t - t0) / (t1 - t0) * (R - L), y = v => B - (Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo) * (B - T);
+  let s = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" role="img" aria-label="' + rpEsc(label) + '">';
+  for(let i = 0; i <= 4; i++){ const v = lo + (hi - lo) * i / 4, yy = y(v); s += '<line x1="' + L + '" x2="' + R + '" y1="' + yy + '" y2="' + yy + '" stroke="#e3e3e3"/><text x="' + (L - 6) + '" y="' + (yy + 3.5) + '" text-anchor="end" font-size="10" fill="#777">' + Math.round(v) + '</text>'; }
+  for(let tt = t0; tt <= t1 + 1; tt += step){ const xx = x(tt), lab = new Date(tt).toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:false}); s += '<line x1="' + xx + '" x2="' + xx + '" y1="' + T + '" y2="' + B + '" stroke="#f0f0f0"/><text x="' + xx + '" y="' + (B + 16) + '" text-anchor="' + (xx <= L + 1 ? 'start' : xx >= R - 1 ? 'end' : 'middle') + '" font-size="10" fill="#777">' + (tt >= startOfDay().getTime() + 864e5 ? '24:00' : lab) + '</text>'; }
+  const now = Math.min(R, x(Date.now())); s += '<line x1="' + now + '" x2="' + now + '" y1="' + T + '" y2="' + B + '" stroke="#bbb" stroke-dasharray="2 3"/><text x="' + now + '" y="' + (T + 9) + '" text-anchor="middle" font-size="9" fill="#999">ahora</text>';
+  if(thr !== undefined){ const yy = y(thr); s += '<line x1="' + L + '" x2="' + R + '" y1="' + yy + '" y2="' + yy + '" stroke="#d7263d" stroke-width="1.2" stroke-dasharray="6 4"/><text x="' + (R - 2) + '" y="' + (yy - 4) + '" text-anchor="end" font-size="9.5" fill="#d7263d">límite ' + thr + unit + '</text>'; }
+  if(series.length > 1){
+    const p = series.map(d => x(d.t).toFixed(1) + ',' + y(d.v).toFixed(1)).join(' ');
+    s += '<polygon points="' + x(series[0].t).toFixed(1) + ',' + B + ' ' + p + ' ' + x(series[series.length - 1].t).toFixed(1) + ',' + B + '" fill="#111" fill-opacity=".06"/>';
+    s += '<polyline points="' + p + '" fill="none" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>';
+  } else s += '<text x="' + ((L + R) / 2) + '" y="' + ((T + B) / 2) + '" text-anchor="middle" font-size="12" fill="#999" font-style="italic">Sin datos suficientes para este día</text>';
+  return s + '</svg>';
+}
+
+function buildReport(d){
+  const now = new Date(), tv = d.temp.map(x => x.v), hv = d.hum.map(x => x.v);
+  const st = rpStats(tv), sh = rpStats(hv);
+  let above = 0;
+  for(let i = 0; i < d.temp.length; i++){ if(d.temp[i].v > TEMP_MAX){ const nx = d.temp[i + 1] ? d.temp[i + 1].t : Math.min(Date.now(), d.temp[i].t + 3e5); above += Math.min(nx - d.temp[i].t, 6e5); } }
+  const doors = rpRises(d.puerta), leaks = rpRises(d.agua);
+  const lvl = document.body.dataset.s || '', gen = $('gTxt') ? $('gTxt').textContent : '—';
+  const f1 = v => v.toFixed(1);
+  // Resumen automático
+  let sum = '';
+  if(st){
+    sum = 'Durante el día se registraron ' + d.temp.length + ' lecturas de temperatura. La temperatura promedio fue de ' + f1(st.avg) + ' °C, con una mínima de ' + f1(st.min) + ' °C y una máxima de ' + f1(st.max) + ' °C';
+    sum += above > 0 ? ', y superó el límite de ' + TEMP_MAX + ' °C durante ' + rpDur(above) + '. ' : ', sin superar el límite de ' + TEMP_MAX + ' °C. ';
+    if(sh) sum += 'La humedad relativa promedió ' + Math.round(sh.avg) + ' % (entre ' + Math.round(sh.min) + ' % y ' + Math.round(sh.max) + ' %). ';
+    sum += (doors ? 'La puerta se abrió ' + doors + (doors === 1 ? ' vez' : ' veces') : 'No se registraron aperturas de puerta') + ' y ' + (leaks ? (leaks === 1 ? 'se detectó 1 fuga' : 'se detectaron ' + leaks + ' fugas') + ' de agua.' : 'no se detectaron fugas de agua.');
+  } else sum = 'Todavía no hay lecturas registradas hoy. Conecta la Pico o activa la demo para generar datos.';
+  // Observaciones
+  const obs = [];
+  if(d.demo) obs.push('Este reporte se generó con datos de demostración, no con lecturas reales de la Pico.');
+  if(above > 0) obs.push('La temperatura estuvo por encima de ' + TEMP_MAX + ' °C durante ' + rpDur(above) + '. Se recomienda revisar la ventilación y la carga térmica del rack.');
+  if(st && st.max >= TEMP_WARN && above === 0) obs.push('La temperatura llegó a la zona de precaución (' + f1(st.max) + ' °C). Conviene vigilar la ventilación en las horas de mayor carga.');
+  if(leaks) obs.push((leaks === 1 ? 'Se detectó 1 evento' : 'Se detectaron ' + leaks + ' eventos') + ' de fuga de agua. Inspeccionar el piso y las tuberías cercanas al rack.');
+  if(doors) obs.push('La puerta se abrió ' + doors + (doors === 1 ? ' vez' : ' veces') + '. Verificar que los accesos estén autorizados.');
+  if(sh && sh.max > 70) obs.push('La humedad superó el 70 %. Revisar posibles filtraciones o la climatización del cuarto.');
+  if(st && !above && !leaks && !doors && !(sh && sh.max > 70) && !d.demo) obs.push('Todas las variables se mantuvieron dentro de los rangos seguros durante el día.');
+  if(!obs.length) obs.push('Sin observaciones adicionales.');
+  const k = (lab, val, small, al) => '<div class="rp-k' + (al ? ' rp-al' : '') + '"><span>' + lab + '</span><b>' + val + '</b><small>' + small + '</small></div>';
+  const evRows = d.events.length ? d.events.slice(0, 60).map(e => '<tr><td>' + rpEsc(e.time) + '</td><td>' + rpEsc(e.text) + '</td><td class="lv ' + (e.lv.includes('bad') ? 'bad' : e.lv.includes('warn') ? 'warn' : '') + '">' + (e.lv.includes('bad') ? 'Crítico' : e.lv.includes('warn') ? 'Precaución' : 'Info') + '</td></tr>').join('')
+    : '<tr><td colspan="3"><i>No se registraron alertas ni eventos.</i></td></tr>';
+  const logo = '<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="3"><path d="M24 3l18 10.5v21L24 45 6 34.5v-21z"/><path d="M16 33V15l16 18V15"/></svg>';
+  $('report').innerHTML =
+    '<header class="rp-h"><div class="rp-brand">' + logo + '<div><b>NEXUS MONITOR</b><span>Infraestructura y monitoreo</span></div></div>' +
+    '<div class="rp-meta"><b>' + (s => s.charAt(0).toUpperCase() + s.slice(1))(now.toLocaleDateString('es-PE', {weekday:'long', day:'numeric', month:'long', year:'numeric'})) + '</b>Periodo: 00:00 – ' + rpHm(now) + '<br>Generado: ' + now.toLocaleString('es-PE') + '<br>Fuente: ' + rpEsc(d.source) + '</div></header>' +
+    '<h1 class="rp-title">Reporte diario del cuarto de comunicaciones</h1><p class="rp-sub">Proyecto 11 · Monitoreo con Raspberry Pi Pico 2 W</p>' +
+    '<span class="rp-state ' + lvl + '"><i></i>Estado al generar el reporte: <b>' + rpEsc(gen) + '</b></span>' +
+    '<h2>Resumen del día</h2><p class="rp-sum">' + rpEsc(sum) + '</p>' +
+    '<h2>Indicadores del día</h2><div class="rp-kpis">' +
+      k('Temperatura promedio', st ? f1(st.avg) + ' °C' : '—', st ? 'mín ' + f1(st.min) + ' · máx ' + f1(st.max) + ' °C' : 'sin datos', st && st.max > TEMP_MAX) +
+      k('Humedad promedio', sh ? Math.round(sh.avg) + ' %' : '—', sh ? 'mín ' + Math.round(sh.min) + ' · máx ' + Math.round(sh.max) + ' %' : 'sin datos', sh && sh.max > 70) +
+      k('Tiempo sobre ' + TEMP_MAX + ' °C', above ? rpDur(above) : '0 min', above ? 'requiere atención' : 'dentro del límite', above > 0) +
+      k('Aperturas de puerta', doors, doors ? 'revisar accesos' : 'sin accesos', false) +
+      k('Fugas de agua', leaks, leaks ? 'inspeccionar el piso' : 'sin incidencias', leaks > 0) +
+      k('Ventilación actual', (S.fan != null ? S.fan + ' %' : '—'), 'modo ' + (MODOS[S.mode] ? MODOS[S.mode][1].toLowerCase() : '—'), false) +
+    '</div>' +
+    '<h2>Temperatura durante el día</h2><div class="rp-chart">' + rpChart(d.temp, 15, 40, TEMP_MAX, ' °C', 'Temperatura del día') + '</div>' +
+    '<h2>Humedad durante el día</h2><div class="rp-chart">' + rpChart(d.hum, 20, 90, undefined, ' %', 'Humedad del día') + '</div>' +
+    '<h2>Alertas y eventos</h2><table class="rp-t"><thead><tr><th style="width:92px">Hora</th><th>Evento</th><th style="width:90px">Nivel</th></tr></thead><tbody>' + evRows + '</tbody></table>' +
+    (d.exactEvents ? '' : '<p class="rp-note">Eventos registrados por esta página desde que se abrió.</p>') +
+    '<h2>Observaciones</h2><ul class="rp-obs">' + obs.map(o => '<li>' + rpEsc(o) + '</li>').join('') + '</ul>' +
+    '<footer class="rp-f"><span>NEXUS MONITOR · Proyecto 11 · Arquitectura del Computador I</span><span>Reporte generado automáticamente</span></footer>';
+  reportAt = Date.now();
+}
+
+function makeReport(){
+  const key = $('pass').value, user = $('user').value.trim();
+  const useAio = mode === 'mqtt' && src === 'aio' && key && user;
+  const go = d => { buildReport(d); setTimeout(() => window.print(), 150); };
+  if(!useAio){ go(collectLocal()); return; }
+  toast('Preparando el reporte del día', 'Descargando las lecturas de hoy desde Adafruit IO…', '');
+  collectAdafruit(user, key).then(d => go(d.temp.length ? d : Object.assign(collectLocal(), {source: 'Lecturas registradas en este dispositivo (Adafruit no devolvió datos)'})))
+    .catch(() => go(Object.assign(collectLocal(), {source: 'Lecturas registradas en este dispositivo (no se pudo leer Adafruit IO)'})));
+}
+$('pdfBtn').onclick = makeReport;
+$('pdfBtn').title = 'Generar el reporte del día en PDF';
+// Ctrl + P también imprime el reporte (con los datos de este dispositivo)
+addEventListener('beforeprint', () => { if(Date.now() - reportAt > 3000) buildReport(collectLocal()); });
+
+/* ===== Barra de navegación inferior para celular ===== */
+(function(){
+  const nav = document.createElement('nav'); nav.className = 'tabbar'; nav.setAttribute('aria-label', 'Navegación');
+  const items = [['#top', 'i-d', 'Panel'], ['#alertas', 'i-a', 'Alertas'], ['#eventos', 'i-e', 'Eventos'], ['#cfgBox', 'i-g', 'Ajustes']];
+  nav.innerHTML = items.map((x, i) => '<a href="' + x[0] + '"' + (i ? '' : ' class="on"') + '><svg class="ic"><use href="#' + x[1] + '"/></svg>' + x[2] + '</a>').join('');
+  document.body.appendChild(nav);
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', e => {
+    nav.querySelectorAll('a').forEach(b => b.classList.toggle('on', b === a));
+    if(a.getAttribute('href') === '#cfgBox'){ e.preventDefault(); $('cfgBox').open = true; $('cfgBox').scrollIntoView({behavior:'smooth', block:'start'}); }
+  }));
+})();
+</script>
+
+<section id="report" aria-hidden="true"></section>
 </body>
 </html>
